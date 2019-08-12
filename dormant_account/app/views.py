@@ -5,6 +5,7 @@ from django.contrib import auth
 
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.db.models import Max
 
 import re
 import datetime
@@ -46,12 +47,13 @@ def signup(request):
 
 
 def write(request):
-    cnt = len(Content.objects.all())
+    number = Content.objects.aggregate(number=Max('number'))
+
     if request.method == 'POST':
         title = request.POST['title']
         content = request.POST.get('content')
         Content.user = request.user
-        Content(number=cnt + 1, title=title, contents=content, writer=User.get_username(Content.user)).save()
+        Content(number=number.get('number')+1, title=title, contents=content, writer=User.get_username(Content.user)).save()
         return redirect(to='board')
 
     return render(request, 'app/write.html')
@@ -59,10 +61,11 @@ def write(request):
 
 def board(request):
     content_all = Content.objects.all()
+    total_content = len(content_all)# 총 게시물 수
     dormant_account = None
     user = request.user
 
-    return render(request, 'app/board.html', {'contents': content_all,'dormant_account':dormant_account,'userdata':user})
+    return render(request, 'app/board.html', {'contents': content_all,'dormant_account':dormant_account,'userdata':user,'total':total_content})
 
 
 def user(request):
@@ -91,7 +94,13 @@ def detail(request,number):  # 해당 number의 게시물을 불러와 html로 �
 
 
 def delete(request,number):  # 미구현
-    return render(request,'/')
+    content = Content.objects.get(number=number)
+    if content.writer == request.user.get_username():  # 작성자와 사용자를 비교 일치시만 수정가능
+        content.delete()
+        return redirect('board')
+    else:
+        alert = True
+        return render(request, 'app/detail.html', {'content': content, 'alert': alert})
 
 
 def edit(request,number):
@@ -102,7 +111,6 @@ def edit(request,number):
         content.last_edit = datetime.datetime.now(timezone.utc)
         content.save()
         return render(request,'app/detail.html',{'content':content})
-        # return rediect(to='detail'+str(number))
     else:  # 수정 페이지로 이동
         if content.writer == request.user.get_username():  # 작성자와 사용자를 비교 일치시만 수정가능
             return render(request,'app/edit.html',{'content':content})
