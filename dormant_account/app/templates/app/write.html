@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>글쓰기</title>
+</head>
+<body>
+    <h2>게시물 작성</h2>
+
+    <form method="POST" action="{% url 'write' %}">{% csrf_token %}
+        <input type="text" name="title" placeholder="제목"><br><br>
+        <input type="text" name="content" placeholder="내용" width=100 height=100><br><br>
+        <input type="submit" value="저장하기">
+    </form>
+</body>
+</html>

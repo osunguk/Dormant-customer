@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판</title>
+</head>
+<body>
+    <h2>공지사항</h2>
+    {% if dormant_account %}
+        <p>휴면 계정 입니다</p>
+    {% endif %}
+
+
+    <h2>게시판</h2>
+    {% for content in contents %}
+    ============================
+    <p><b>제목</b> : {{content.title}} <b>&nbsp&nbsp&nbsp&nbsp&nbsp작성자</b> : {{content.writer}}</p>
+    ----------------------------
+    <p><b>내용</b> : {{content.contents}} <a href="{% url 'detail' content.number %}">더보기</a></p>
+    {% endfor %}
+    ============================
+    <br><br>
+    <a href="{% url 'write' %}">글쓰기</a>
+    <br><br>
+    <a href="{% url 'logout' %}">로그아웃</a>
+    <br><br>
+    <p>사용자 : {{userdata}}</p>
+    <p><a href="{% url 'user' %}">더보기</a></p>
+</body>
+</html>
