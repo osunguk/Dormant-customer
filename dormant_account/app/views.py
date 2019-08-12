@@ -90,7 +90,7 @@ def detail(request,number):  # 해당 number의 게시물을 불러와 html로 �
     return render(request,'app/detail.html',{'content':content})
 
 
-def delete(request,number):
+def delete(request,number):  # 미구현
     return render(request,'/')
 
 
