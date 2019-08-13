@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import Content
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import auth
 
 from django.utils import timezone
@@ -21,8 +21,15 @@ def login(request):
         name = request.POST.get('username')
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)
+        general_group = Group.objects.get(name='General users')
+        #check_DormantAccount = user.groups.filter(name='dormant_account').exists()
         if user is not None:
             auth.login(request, user)
+            # 휴면계정일때 로그인 하면 일반그룹으로 이동
+            if user.groups.filter(name='dormant_account').exists():
+                tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
+                tempgroup.group = general_group
+                tempgroup.save()
             return redirect('board')
         else:
             return render(request, 'app/login.html',{'error':'잘못된 id 또는 pwd 입니다'})
@@ -39,7 +46,11 @@ def signup(request):
     if request.method == 'POST':
         username = request.POST['name']
         userpwd = request.POST['pwd']
-        User.objects.create_user(username=username,password=userpwd)
+        user = User.objects.create_user(username=username,password=userpwd)
+
+        # 회원가입 후 일반유저 그룹에 추가
+        general_group = Group.objects.get(name='General users')
+        general_group.user_set.add(user)
         # auth.login(request,user)
         return redirect(to='home')
 
@@ -75,8 +86,14 @@ def user(request):
     # num = re.findall("\d+", last_login)
 
     now = datetime.datetime.now(timezone.utc)
-
+    day = (now - last_login).days
     result = (now - last_login)
+    dormant_group = Group.objects.get(name='dormant_account')
+    # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
+    if (now - last_login).days >= 0:
+        tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
+        tempgroup.group = dormant_group
+        tempgroup.save()
 
     '''
     휴면계정 전환 30일전 통보
@@ -84,7 +101,7 @@ def user(request):
     
     '''
 
-    return render(request, 'app/user.html',{'name':user,'last_login':last_login,'joined_data':joined_data,'now':now,'result':result})
+    return render(request, 'app/user.html',{'name':user,'last_login':last_login,'joined_data':joined_data,'now':now,'result':result,'day':day})
 
 
 def detail(request,number):  # 해당 number의 게시물을 불러와 html로 전송
