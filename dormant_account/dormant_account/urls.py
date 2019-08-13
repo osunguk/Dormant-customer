@@ -19,6 +19,7 @@ import app.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('user_list',app.views.user_list,name='user_list'),
     path('',app.views.home,name='home'),
     path('login',app.views.login,name='login'),
     path('logout',app.views.logout,name='logout'),

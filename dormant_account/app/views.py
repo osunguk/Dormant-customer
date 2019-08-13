@@ -119,3 +119,6 @@ def edit(request,number):
             return render(request,'app/detail.html',{'content':content,'alert':alert})
 
 
+def user_list(request):
+    userList = User.objects.values()
+    return render(request,'app/user_list.html',{'userList':userList})
