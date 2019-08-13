@@ -29,7 +29,8 @@ def login(request):
         user = auth.authenticate(request, username=name, password=pwd)
         general_group = Group.objects.get(name='General users')
         check_DormantAccount = user.groups.filter(name='dormant_account').exists()
-
+        content_all = Content.objects.all()
+        total_content = len(content_all)  # 총 게시물 수
         if user is not None:
             auth.login(request, user)
             # 휴면계정일때 로그인 하면 일반그룹으로 이동
@@ -37,7 +38,7 @@ def login(request):
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
                 tempgroup.save()
-            return render(request, 'app/board.html',{'check_DormantAccount':check_DormantAccount})
+            return render(request, 'app/board.html',{'check_DormantAccount':check_DormantAccount,'contents': content_all,'total':total_content})
         else:
             return render(request, 'app/login.html',{'error':'잘못된 id 또는 pwd 입니다'})
     else:
