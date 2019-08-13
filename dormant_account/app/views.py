@@ -6,10 +6,16 @@ from django.contrib import auth
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Max
-
-import re
 import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.base import JobLookupError
+
 # Create your views here.
+
+sched = BackgroundScheduler()
+
+sched.start()
+
 
 
 def home(request):
@@ -22,7 +28,8 @@ def login(request):
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)
         general_group = Group.objects.get(name='General users')
-        #check_DormantAccount = user.groups.filter(name='dormant_account').exists()
+        check_DormantAccount = user.groups.filter(name='dormant_account').exists()
+
         if user is not None:
             auth.login(request, user)
             # 휴면계정일때 로그인 하면 일반그룹으로 이동
@@ -30,7 +37,7 @@ def login(request):
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
                 tempgroup.save()
-            return redirect('board')
+            return render(request, 'app/board.html',{'check_DormantAccount':check_DormantAccount})
         else:
             return render(request, 'app/login.html',{'error':'잘못된 id 또는 pwd 입니다'})
     else:
@@ -83,14 +90,13 @@ def user(request):
     user = request.user
     last_login = request.user.last_login
     joined_data = request.user.date_joined
-    # num = re.findall("\d+", last_login)
 
     now = datetime.datetime.now(timezone.utc)
     day = (now - last_login).days
     result = (now - last_login)
     dormant_group = Group.objects.get(name='dormant_account')
     # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
-    if (now - last_login).days >= 0:
+    if (now - last_login).days >= 365:
         tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
         tempgroup.group = dormant_group
         tempgroup.save()

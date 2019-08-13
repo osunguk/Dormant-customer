@@ -5,11 +5,15 @@
     <title>게시판</title>
 </head>
 <body>
+    {% if check_DormantAccount %}
+        <script>
+            alert("휴면계정에서 일반계정으로 전환되었습니다.")
+        </script>
+    {% endif %}
     <h2>공지사항</h2>
     {% if dormant_account %}
         <p>휴면 계정 입니다</p>
     {% endif %}
-
 
     <h2>게시판</h2>
     <p>총 게시물 수 : {{total}}개</p>
