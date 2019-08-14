@@ -18,12 +18,15 @@ def dormant_Alert():
         now = datetime.datetime.now(timezone.utc)
         last_login = users['last_login']
         if last_login is None:
+            #print(users['username'])
             last_login = users['date_joined']
         dormant_Time = datetime.timedelta(days=365) + last_login - now
-        Profile.objects.filter(id=users['id']).update(dormant_cnt=dormant_Time.days)
+        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
 
+        """
         if (dormant_Time).days == 365-1: # 휴면계정 변환 x일 전 알림 (365 - x)
             print('ID : '+users['username'] + '은(는)' + str((dormant_Time).days) + '일 뒤 휴면계정으로 전환됩니다.')
+        """
 
 
 # 휴면계정 전환
@@ -45,12 +48,6 @@ def change_AccountGroup():
             user.groups.remove(general_group)
             print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
 
-
-            """
-            tempgroup = User.groups.through.objects.get(user=users)
-            tempgroup.group = dormant_group
-            tempgroup.save()
-            """
 
 sched = BackgroundScheduler()
 sched.add_job(change_AccountGroup, 'interval', seconds=3)
@@ -195,4 +192,4 @@ def test(request):
     G_user = User.objects.filter(groups__name='General users')
     A_user = User.objects.filter(groups__name='admin')
     D_user = User.objects.filter(groups__name='dormant_account')
-    return render(request,'app/test.html', {'G_user':G_user,'A_user':A_user,'D_user':D_user})
+    return render(request,'app/test.html', {'G_user':G_user,'A_user':A_user,'D_user':D_user,'G_cnt':len(G_user),'A_cnt':len(A_user),'D_cnt':len(D_user)})

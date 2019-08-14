@@ -25,7 +25,7 @@ class Profile(models.Model):
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
 
     def __str__(self):
-        return str(self.user)
+        return str(self.dormant_cnt)
 
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드

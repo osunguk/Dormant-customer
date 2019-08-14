@@ -5,17 +5,17 @@
     <title>test</title>
 </head>
 <body>
-    <h3>General users 목록</h3>
+    <h3>General users 목록 => {{G_cnt}}명</h3>
     {% for result in G_user %}
     <p>{{result}}</p>
     {% endfor %}
 
-    <h3>admin user 목록</h3>
+    <h3>admin user 목록 => {{A_cnt}}명</h3>
     {% for result in A_user %}
     <p>{{result}}</p>
     {% endfor %}
 
-    <h3>dormant_account user 목록</h3>
+    <h3>dormant_account user 목록 => {{D_cnt}}명</h3>
     {% for result in D_user %}
     <p>{{result}}</p>
     {% endfor %}
