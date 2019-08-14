@@ -13,7 +13,7 @@ class Content(models.Model):
     writer = models.CharField('writer', max_length=100)
 
     date_joined = models.DateTimeField(default=timezone.now)
-    last_edit = models.DateTimeField(blank=True, null=True)
+    last_edit = models.DateTimeField(blank=True)
 
     def __str__(self):
         return self.title
@@ -26,8 +26,7 @@ class Profile(models.Model):
 
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
-# @receiver 의 파라미터는 어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지)
-
+# @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

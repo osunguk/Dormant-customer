@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import Content
+from .models import Content, Profile
 from django.contrib.auth.models import User, Group
 from django.contrib import auth
 
@@ -32,6 +32,7 @@ def login(request):
 
         if user is not None:
             auth.login(request, user)
+            Profile(dormant_count = 0).save()  # 로그인 했을 때 휴면 계정 전환 카운트 초기화
             # 휴면계정일때 로그인 하면 일반그룹으로 이동
             if user.groups.filter(name='dormant_account').exists():
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
