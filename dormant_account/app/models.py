@@ -24,6 +24,9 @@ class Profile(models.Model):
     dormant_count = models.DateField(blank=True)
     nickname = models.CharField('nickname', max_length=100, blank=True)
 
+    def __str__(self):
+        return str(self.user)
+
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))
