@@ -75,6 +75,9 @@ def login(request):
         total_content = len(content_all)  # 총 게시물 수
         if user is not None:
             auth.login(request, user)
+            p = Profile.objects.get(user=user)
+            p.dormant_cnt = 365
+            p.save()
             if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
