@@ -21,7 +21,6 @@ class Content(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
-    dormant_count = models.DateField(blank=True)
     nickname = models.CharField('nickname', max_length=100, blank=True)
     dormant_cnt = models.IntegerField('d_cnt',default=0)
 
