@@ -19,14 +19,11 @@ def dormant_Alert():
         last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        if users['username']=='created_0814':
-            print(last_login)
         dormant_Time = datetime.timedelta(days=365) + last_login - now
-        #print(users['username'])
-        #print(dormant_Time)
         Profile.objects.filter(id=users['id']).update(dormant_cnt=dormant_Time.days)
-        if now == (last_login + datetime.timedelta(days=335)): # 휴면계정 변환 30일 전 알림
-            print('ID : '+users['username'] + '은(는) 30일 뒤 휴면계정으로 전환됩니다.')
+
+        if (dormant_Time).days == 365-1: # 휴면계정 변환 x일 전 알림 (365 - x)
+            print('ID : '+users['username'] + '은(는)' + str((dormant_Time).days) + '일 뒤 휴면계정으로 전환됩니다.')
 
 
 # 휴면계정 전환
@@ -74,12 +71,13 @@ def login(request):
         general_group = Group.objects.get(name='General users')
 
         User.objects.filter(username=name).update(last_login=timezone.now())
-        check_DormantAccount = user.groups.filter(name='dormant_account').exists()
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
 
         if user is not None:
+            check_DormantAccount = user.groups.filter(name='dormant_account').exists()
+            auth.login(request, user)
             if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
