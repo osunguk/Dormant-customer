@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import Content, Profile
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group,AnonymousUser
 from django.contrib import auth
 
 from django.utils import timezone
@@ -8,12 +8,48 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Max
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.jobstores.base import JobLookupError
 
-# Create your views here.
+#휴면계정 알림
+def dormant_Alert():
+    userList = User.objects.values()
+
+    for users in userList:
+        last_login = users['last_login']
+        now = datetime.datetime.now(timezone.utc)
+        if last_login is None:
+            last_login = users['date_joined']
+        if now == (last_login + datetime.timedelta(days=335)): # 휴면계정 변환 30일 전 알림
+            print('ID : '+users['username'] + '은(는) 30일 뒤 휴면계정으로 전환됩니다.')
+    #print('Background scheduler \'dormant_Alter()\' start')
+
+#휴면계정 전환
+def change_AccountGroup():
+    userList = User.objects.values()
+    dormant_group = Group.objects.get(name='dormant_account')
+    general_group = Group.objects.get(name='General users')
+    for users in userList:
+        user = User.objects.get(username=users['username']) #유저리스트에서 username 가져옴
+        last_login = users['last_login']
+
+        now = datetime.datetime.now(timezone.utc)
+        if last_login is None:
+            last_login = users['date_joined']
+
+        # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
+        if (now - last_login).days >= 365:
+            dormant_group.user_set.add(user)
+            user.groups.remove(general_group)
+            print('ID : '+users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
+
+            """
+            tempgroup = User.groups.through.objects.get(user=users)
+            tempgroup.group = dormant_group
+            tempgroup.save()
+            """
 
 sched = BackgroundScheduler()
-
+sched.add_job(change_AccountGroup, 'interval', seconds=60)
+sched.add_job(dormant_Alert, 'interval', seconds=3)
 sched.start()
 
 
@@ -26,10 +62,11 @@ def login(request):
     if request.method == 'POST':
         name = request.POST.get('username')
         pwd = request.POST.get('pwd')
-        user = auth.authenticate(request, username=name, password=pwd)
+        user = auth.authenticate(request, username=name, password=pwd) #인증
         general_group = Group.objects.get(name='General users')
         check_DormantAccount = user.groups.filter(name='dormant_account').exists()
-
+        content_all = Content.objects.all()
+        total_content = len(content_all)  # 총 게시물 수
         if user is not None:
             auth.login(request, user)
             Profile(dormant_count = 0).save()  # 로그인 했을 때 휴면 계정 전환 카운트 초기화
@@ -38,7 +75,7 @@ def login(request):
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
                 tempgroup.save()
-            return render(request, 'app/board.html',{'check_DormantAccount':check_DormantAccount})
+            return render(request, 'app/board.html',{'check_DormantAccount':check_DormantAccount,'contents': content_all,'total':total_content})
         else:
             return render(request, 'app/login.html',{'error':'잘못된 id 또는 pwd 입니다'})
     else:
@@ -146,3 +183,4 @@ def edit(request,number):
 def user_list(request):
     userList = User.objects.values()
     return render(request,'app/user_list.html',{'userList':userList})
+

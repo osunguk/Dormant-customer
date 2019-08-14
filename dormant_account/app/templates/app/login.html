@@ -3,23 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <h2>로그인</h2>
-    <form method="post" action="{%url 'login' %}">
-        {% csrf_token %}
-        {% if error %}
-            <p>{{error}}</p>
-        {% endif %}
+<div class="container">
+  <h2>로그인</h2>
 
-        Username: <br>
-        <input name = 'username' type="text">
-        <br>Password: <br>
-        <input name = 'pwd' type="password">
-        <br><br>
-        <input type="submit" value="log-in">
+  <form method="post" action="{%url 'login' %}" class="was-validated">
+      {% csrf_token %}
+      {% if error %}
+        <p>{{error}}</p>
+      {% endif %}
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" class="form-control" id="username" placeholder="Enter username" name="username" required>
+      <div class="valid-feedback">Valid.</div>
+      <div class="invalid-feedback">Please fill out this field.</div>
+    </div>
+    <div class="form-group">
+      <label for="pwd">Password:</label>
+      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd" required>
+      <div class="valid-feedback">Valid.</div>
+      <div class="invalid-feedback">Please fill out this field.</div>
+    </div>
+    <button type="submit"  class="btn btn-primary">Login</button>
 
-    </form>
     <p><a href="{% url 'home' %}">home</a></p>
+  </form>
+</div>
+
+
 </body>
 </html>
