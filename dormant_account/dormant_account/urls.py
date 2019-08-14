@@ -29,5 +29,6 @@ urlpatterns = [
     path('board',app.views.board,name='board'),
     path('detail/<int:number>',app.views.detail,name='detail'),
     path('detail/<int:number>/edit',app.views.edit,name='edit'),
-    path('detail/<int:number>/delete',app.views.delete,name='delete')
+    path('detail/<int:number>/delete',app.views.delete,name='delete'),
+    path('test',app.views.test,name='test')
 ]

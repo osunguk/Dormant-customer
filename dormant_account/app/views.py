@@ -9,6 +9,7 @@ from django.db.models import Max
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
+
 # 휴면계정 알림
 def dormant_Alert():
     userList = User.objects.values()
@@ -18,14 +19,14 @@ def dormant_Alert():
         last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        dormant_Time = last_login + datetime.timedelta(days=335) - now
+        if users['username']=='created_0814':
+            print(last_login)
+        dormant_Time = datetime.timedelta(days=365) + last_login - now
+        #print(users['username'])
+        #print(dormant_Time)
         Profile.objects.filter(id=users['id']).update(dormant_cnt=dormant_Time.days)
-        if last_login is None:
-            last_login = users['date_joined']
         if now == (last_login + datetime.timedelta(days=335)): # 휴면계정 변환 30일 전 알림
             print('ID : '+users['username'] + '은(는) 30일 뒤 휴면계정으로 전환됩니다.')
-    #print('Background scheduler \'dormant_Alter()\' start')
-
 
 
 # 휴면계정 전환
@@ -55,9 +56,10 @@ def change_AccountGroup():
             """
 
 sched = BackgroundScheduler()
-sched.add_job(change_AccountGroup, 'interval', seconds=60)
+sched.add_job(change_AccountGroup, 'interval', seconds=3)
 sched.add_job(dormant_Alert, 'interval', seconds=3)
 sched.start()
+
 
 
 def home(request):
@@ -70,14 +72,14 @@ def login(request):
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)  # 인증
         general_group = Group.objects.get(name='General users')
+
+        User.objects.filter(username=name).update(last_login=timezone.now())
         check_DormantAccount = user.groups.filter(name='dormant_account').exists()
+
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
+
         if user is not None:
-            auth.login(request, user)
-            p = Profile.objects.get(user=user)
-            p.dormant_cnt = 365
-            p.save()
             if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
@@ -190,3 +192,9 @@ def user_list(request):
         sentence = u.username + '의 휴면계정 전환까지 남은 기간 : ' + str(x['dormant_cnt']) + '일'
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
+
+def test(request):
+    G_user = User.objects.filter(groups__name='General users')
+    A_user = User.objects.filter(groups__name='admin')
+    D_user = User.objects.filter(groups__name='dormant_account')
+    return render(request,'app/test.html', {'G_user':G_user,'A_user':A_user,'D_user':D_user})
