@@ -18,12 +18,12 @@ def dormant_Alert():
         last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        dormant_Time = last_login + datetime.timedelta(days=335) - now
+        dormant_Time = last_login + datetime.timedelta(days=365) - now
         Profile.objects.filter(id=users['id']).update(dormant_cnt=dormant_Time.days)
         if last_login is None:
             last_login = users['date_joined']
-        if now == (last_login + datetime.timedelta(days=335)): # 휴면계정 변환 30일 전 알림
-            print('ID : '+users['username'] + '은(는) 30일 뒤 휴면계정으로 전환됩니다.')
+        if (dormant_Time).days == 365-1: # 휴면계정 변환 x일 전 알림 (365 - x)
+            print('ID : '+users['username'] + '은(는)' + str((dormant_Time).days) + '일 뒤 휴면계정으로 전환됩니다.')
     #print('Background scheduler \'dormant_Alter()\' start')
 
 
