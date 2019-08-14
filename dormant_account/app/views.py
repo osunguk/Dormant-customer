@@ -70,10 +70,11 @@ def login(request):
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)  # 인증
         general_group = Group.objects.get(name='General users')
-        check_DormantAccount = user.groups.filter(name='dormant_account').exists()
+
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
         if user is not None:
+            check_DormantAccount = user.groups.filter(name='dormant_account').exists()
             auth.login(request, user)
             if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
