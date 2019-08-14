@@ -15,18 +15,19 @@ def dormant_Alert():
     userList = User.objects.values()
 
     for users in userList:
+        u = User.objects.get(id=users['id'])
         now = datetime.datetime.now(timezone.utc)
         last_login = users['last_login']
         if last_login is None:
-            #print(users['username'])
             last_login = users['date_joined']
         dormant_Time = datetime.timedelta(days=365) + last_login - now
-        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
+        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)  # 계정 전환 남은기간 계산
 
-        """
-        if (dormant_Time).days == 365-1: # 휴면계정 변환 x일 전 알림 (365 - x)
-            print('ID : '+users['username'] + '은(는)' + str((dormant_Time).days) + '일 뒤 휴면계정으로 전환됩니다.')
-        """
+        if (dormant_Time).days <= 30 :  # 휴면계정 변환 30일 전 알림
+            if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
+                # print('ID : '+users['username'] + '은(는)' + str((dormant_Time).days) + '일 뒤 휴면계정으로 전환됩니다.')
+                Profile.objects.filter(user_id=users['id']).update(check=str((dormant_Time).days)+'일 뒤 휴면계정으로 전환 예정')
+
 
 
 # 휴면계정 전환
@@ -46,7 +47,7 @@ def change_AccountGroup():
         if (now - last_login).days >= 365:
             dormant_group.user_set.add(user)
             user.groups.remove(general_group)
-            print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
+            # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
 
 
 sched = BackgroundScheduler()
