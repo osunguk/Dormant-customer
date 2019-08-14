@@ -17,7 +17,9 @@
   <form method="post" action="{%url 'login' %}" class="was-validated">
       {% csrf_token %}
       {% if error %}
-        <p>{{error}}</p>
+        <script>
+            alert('{{error}}')
+        </script>
       {% endif %}
     <div class="form-group">
       <label for="username">Username:</label>

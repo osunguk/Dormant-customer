@@ -23,9 +23,14 @@ def dormant_Alert():
         Profile.objects.filter(id=users['id']).update(dormant_cnt=dormant_Time.days)
         if last_login is None:
             last_login = users['date_joined']
-        if now == (last_login + datetime.timedelta(days=335)):  # 휴면계정 변환 30일 전 알림
-            print('ID : ' + users['username'] + '은(는) 30일 뒤 휴면계정으로 전환됩니다.')
-    # print('Background scheduler \'dormant_Alter()\' start')
+        if now == (last_login + datetime.timedelta(days=335)): # 휴면계정 변환 30일 전 알림
+            print('ID : '+users['username'] + '은(는) 30일 뒤 휴면계정으로 전환됩니다.')
+
+    dormant_Time = last_login + datetime.timedelta(days=335)-now
+
+    print(dormant_Time.days)
+    #print('Background scheduler \'dormant_Alter()\' start')
+
 
 
 # 휴면계정 전환
@@ -64,10 +69,11 @@ def login(request):
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)  # 인증
         general_group = Group.objects.get(name='General users')
-        check_DormantAccount = user.groups.filter(name='dormant_account').exists()
+
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
         if user is not None:
+            check_DormantAccount = user.groups.filter(name='dormant_account').exists()
             auth.login(request, user)
             # Profile(dormant_count = 0).save()  # 로그인 했을 때 휴면 계정 전환 카운트 초기화
             if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동

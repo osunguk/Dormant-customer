@@ -13,7 +13,7 @@ class Content(models.Model):
     writer = models.CharField('writer', max_length=100)
 
     date_joined = models.DateTimeField(default=timezone.now)
-    last_edit = models.DateTimeField(default=timezone.now)
+    last_edit = models.DateTimeField(blank=True)
 
     def __str__(self):
         return self.title
@@ -23,7 +23,6 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
     dormant_count = models.IntegerField('dormant_count', max_length=365, blank=True)
     nickname = models.CharField('nickname', max_length=100, blank=True)
-    dormant_cnt = models.IntegerField('d_cnt',default=0)
 
     def __str__(self):
         return str(self.user)
@@ -35,7 +34,6 @@ class Profile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-
 
 
 @receiver(post_save, sender=User)
