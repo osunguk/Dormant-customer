@@ -69,9 +69,8 @@ def login(request):
         total_content = len(content_all)  # 총 게시물 수
         if user is not None:
             auth.login(request, user)
-            Profile(dormant_count = 0).save()  # 로그인 했을 때 휴면 계정 전환 카운트 초기화
-            # 휴면계정일때 로그인 하면 일반그룹으로 이동
-            if user.groups.filter(name='dormant_account').exists():
+            #Profile(dormant_count = 0).save()  # 로그인 했을 때 휴면 계정 전환 카운트 초기화
+            if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동
                 tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
                 tempgroup.group = general_group
                 tempgroup.save()
@@ -132,18 +131,6 @@ def user(request):
     now = datetime.datetime.now(timezone.utc)
     day = (now - last_login).days
     result = (now - last_login)
-    dormant_group = Group.objects.get(name='dormant_account')
-    # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
-    if (now - last_login).days >= 365:
-        tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
-        tempgroup.group = dormant_group
-        tempgroup.save()
-
-    '''
-    휴면계정 전환 30일전 통보
-    if last_login + timedelta(days=335)
-    
-    '''
 
     return render(request, 'app/user.html',{'name':user,'last_login':last_login,'joined_data':joined_data,'now':now,'result':result,'day':day})
 
@@ -154,7 +141,7 @@ def detail(request,number):  # 해당 number의 게시물을 불러와 html로 �
     return render(request,'app/detail.html',{'content':content})
 
 
-def delete(request,number):  # 미구현
+def delete(request,number):
     content = Content.objects.get(number=number)
     if content.writer == request.user.get_username():  # 작성자와 사용자를 비교 일치시만 수정가능
         content.delete()
