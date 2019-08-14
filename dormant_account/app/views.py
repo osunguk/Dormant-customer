@@ -69,6 +69,8 @@ def login(request):
         general_group = Group.objects.get(name='General users')
 
         User.objects.filter(username=name).update(last_login=timezone.now())
+        Profile.objects.filter(user_id=user.id).update(check='')
+
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
