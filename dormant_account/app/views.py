@@ -188,6 +188,8 @@ def user_list(request):
     for x in list(pList):
         u = User.objects.get(id=x['user_id'])
         sentence = u.username + '의 휴면계정 전환까지 남은 기간 : ' + str(x['dormant_cnt']) + '일'
+        if x['dormant_cnt'] < 0:
+            sentence = u.username + '는 휴면계정입니다'
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
 
