@@ -28,6 +28,28 @@ class Profile(models.Model):
         return str(self.dormant_cnt)
 
 
+class DormantUserC(models.Model):
+    email = models.CharField('이메일', max_length=100)
+    kakaoId = models.CharField('카카오톡 아이디', max_length=100)
+    phoneNumber = models.IntegerField('핸드폰 번호', max_length=15)
+    name = models.CharField('ID', max_length=100)
+    point = models.IntegerField('보유 포인트', max_length=100000)
+
+
+class DormantUserB(models.Model):
+    email = models.CharField('이메일', max_length=100)
+    businessNumber = models.IntegerField('핸드폰 번호', max_length=11)
+    phoneNumber = models.IntegerField('핸드폰 번호', max_length=15)
+    name = models.CharField('ID', max_length=100)
+    point = models.IntegerField('보유 포인트', max_length=100000)
+
+
+class DormantUserInfo(models.Model):
+    lastLogin = models.DateTimeField(blank=True)
+    dormantDate = models.DateTimeField(default=timezone.now)
+    deleteDate = models.DateTimeField(blank=True)
+
+
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))
 @receiver(post_save, sender=User)

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Content, Profile
-from django.contrib.auth.models import User, Group, AnonymousUser
+from django.contrib.auth.models import User, Group
 from django.contrib import auth
 
 from django.utils import timezone
@@ -12,30 +12,27 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 # 휴면계정 알림
 def dormant_Alert():
-    userList = User.objects.values()
-
-    for users in userList:
+    user_list = User.objects.values()
+    for users in user_list:
         u = User.objects.get(id=users['id'])
         now = datetime.datetime.now(timezone.utc)
         last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        dormant_Time = datetime.timedelta(days=365) + last_login - now
-        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)  # 계정 전환 남은기간 계산
+        dormant_Time = datetime.timedelta(days=365) + last_login - now  # 계정 전환 남은기간 계산
+        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
 
-        if (dormant_Time).days <= 30 :  # 휴면계정 변환 30일 전 알림
+        if dormant_Time.days <= 30 :  # 휴면계정 변환 30일 전 알림
             if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
-                # print('ID : '+users['username'] + '은(는)' + str((dormant_Time).days) + '일 뒤 휴면계정으로 전환됩니다.')
-                Profile.objects.filter(user_id=users['id']).update(check=str((dormant_Time).days)+'일 뒤 휴면계정으로 전환 예정')
-
+                Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
 
 
 # 휴면계정 전환
 def change_AccountGroup():
-    userList = User.objects.values()
+    user_list = User.objects.values()
     dormant_group = Group.objects.get(name='dormant_account')
     general_group = Group.objects.get(name='General users')
-    for users in userList:
+    for users in user_list:
         user = User.objects.get(username=users['username'])  # 유저리스트에서 username 가져옴
         last_login = users['last_login']
 
@@ -56,7 +53,6 @@ sched.add_job(dormant_Alert, 'interval', seconds=3)
 sched.start()
 
 
-
 def home(request):
     return render(request, 'app/home.html')
 
@@ -70,7 +66,6 @@ def login(request):
 
         User.objects.filter(username=name).update(last_login=timezone.now())
         Profile.objects.filter(user_id=user.id).update(check='')
-
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
@@ -105,7 +100,6 @@ def signup(request):
         # 회원가입 후 일반유저 그룹에 추가
         general_group = Group.objects.get(name='General users')
         general_group.user_set.add(user)
-        # auth.login(request,user)
         return redirect(to='home')
 
     return render(request, 'app/signup.html')
@@ -118,8 +112,8 @@ def write(request):
         title = request.POST['title']
         content = request.POST.get('content')
         Content.user = request.user
-        Content(number=number.get('number') + 1, title=title, contents=content,
-                writer=User.get_username(Content.user)).save()
+        Content(number=number.get('number') + 1, title=title,
+                contents=content, writer=User.get_username(Content.user)).save()
         return redirect(to='board')
 
     return render(request, 'app/write.html')
@@ -145,9 +139,7 @@ def user(request):
     day = (now - last_login).days
     result = (now - last_login)
 
-    return render(request, 'app/user.html',
-                  {'name': user, 'last_login': last_login, 'joined_data': joined_data, 'now': now, 'result': result,
-                   'day': day})
+    return render(request, 'app/user.html',{'name': user, 'last_login': last_login, 'joined_data': joined_data, 'now': now, 'result': result,'day': day})
 
 
 def detail(request, number):  # 해당 number의 게시물을 불러와 html로 전송
@@ -192,6 +184,7 @@ def user_list(request):
             sentence = u.username + '는 휴면계정입니다'
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
+
 
 def test(request):
     G_user = User.objects.filter(groups__name='General users')
