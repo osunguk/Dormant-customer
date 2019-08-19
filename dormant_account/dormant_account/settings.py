@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
-    'django_celery_results',
+
 ]
 
 MIDDLEWARE = [
@@ -124,5 +124,6 @@ STATIC_URL = '/static/'
 
 BROKER_URL = 'django://'
 
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
+#CELERY_RESULT_BACKEND = 'django-db'
+#CELERY_CACHE_BACKEND = 'django-cache'
+#AUTH_USER_MODEL = 'app.User'

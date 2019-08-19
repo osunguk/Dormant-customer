@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('dormant_count', models.DateField(blank=True, null=True)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                #('check_alert', models.BooleanField(default=False, null=True)),
             ],
         ),
     ]
