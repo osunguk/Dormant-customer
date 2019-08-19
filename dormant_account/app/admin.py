@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
-admin.site.index_title = 'ZEROGO User'
+admin.site.index_title = 'ZEROGO Management'
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
@@ -13,9 +13,17 @@ class ProfileInline(admin.StackedInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'last_login', 'is_staff')
+    inlines = (ProfileInline,)
+    list_display = ('username', 'email', 'last_login', 'check_alter')
     actions = ['grant_is_staff', 'revoke_is_staff']
-    inlines = (ProfileInline, )
+
+    list_filter = ['groups', 'last_login']
+    filter_horizontal = ()
+
+    def check_alter(self,obj):
+
+        return Profile.objects.get(user=obj).check_alert
+
     def grant_is_staff(self, request, queryset):
         queryset.update(is_staff = True)
         self.message_user(request, " changed successfully ." )
@@ -25,7 +33,7 @@ class UserAdmin(BaseUserAdmin):
         queryset.update(is_staff = False)
         self.message_user(request, " changed successfully ." )
     revoke_is_staff.short_description = '스태프권한 제거'
-
+'''
 class CustomAdmin(admin.ModelAdmin):
     list_display = ('id', 'email')
     list_editable = ('permission',)
@@ -33,26 +41,11 @@ class CustomAdmin(admin.ModelAdmin):
     search_fields = ('username',)
 
 
-"""
-class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_location')
-    list_select_related = ('profile', )
-
-    def get_location(self, instance):
-        return instance.profile.location
-    get_location.short_description = 'Location'
-
-    def get_inline_instances(self, request, obj=None):
-        if not obj:
-            return list()
-        return super(CustomUserAdmin, self).get_inline_instances(request, obj)
-"""
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'check', 'dormant_cnt')
-    list_filter = ('user', )
-    actions = ['Test']
+    list_display = ('user', 'check', 'dormant_cnt','check_alert')
+    list_filter = ('user', 'check_alert')
+    actions = ['Test','is_check', 'is_uncheck']
     #search_fields = ('dormant_cnt')
 
     def get_user(self, obj):
@@ -64,11 +57,25 @@ class ProfileAdmin(admin.ModelAdmin):
         #self.message_user((request, 'changed successfully'))
     Test.short_description = '휴면계정 날짜 초기화'
 
+    def is_check(self, request, queryset):
+        queryset.update(check_alert = True)
+        self.message_user(request, " changed successfully ." )
+    is_check.short_description = '휴면알림 O'
 
+    def is_uncheck(self, request, queryset):
+        queryset.update(check_alert = False)
+        self.message_user(request, " changed successfully ." )
+    is_uncheck.short_description = '휴면알림 X'
 
+    def check_alert(self, check_alert):
+        return check_alert.description
 
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+    check_alert.short_description = "휴면알림 유무"
+
 admin.site.register(Content)
 admin.site.register(Profile,ProfileAdmin)
+'''
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
 

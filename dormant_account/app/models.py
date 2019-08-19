@@ -57,7 +57,7 @@ class Profile(models.Model):
     check = models.CharField('check', max_length=100, blank=True)
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
     memo = models.TextField('memo', max_length=300)
-    #check_alert = models.BooleanField(default=False)
+    check_alert = models.BooleanField('check_alter', default=False, blank=True)
 
     def __str__(self):
         return str(self.dormant_cnt)
