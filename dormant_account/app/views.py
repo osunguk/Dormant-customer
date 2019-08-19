@@ -9,7 +9,7 @@ from django.db.models import Max
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
-
+"""
 # 휴면계정 알림
 def dormant_Alert():
     user_list = User.objects.values()
@@ -52,7 +52,7 @@ sched.add_job(change_AccountGroup, 'interval', seconds=3)
 sched.add_job(dormant_Alert, 'interval', seconds=3)
 sched.start()
 
-
+"""
 def home(request):
     return render(request, 'app/home.html')
 
@@ -62,21 +62,17 @@ def login(request):
         name = request.POST.get('username')
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)  # 인증
-        general_group = Group.objects.get(name='General users')
 
+        print(type(user))
         User.objects.filter(username=name).update(last_login=timezone.now())
-        Profile.objects.filter(user_id=user.id).update(check='')
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
 
         if user is not None:
+            Profile.objects.filter(user_id=user.id).update(check='')
             check_DormantAccount = user.groups.filter(name='dormant_account').exists()
             auth.login(request, user)
-            if user.groups.filter(name='dormant_account').exists():  # 휴면계정일때 로그인 하면 일반그룹으로 이동
-                tempgroup = User.groups.through.objects.get(user=user)  # 임시그룹
-                tempgroup.group = general_group
-                tempgroup.save()
             return render(request, 'app/board.html',
                           {'check_DormantAccount': check_DormantAccount, 'contents': content_all,
                            'total': total_content})
@@ -97,9 +93,6 @@ def signup(request):
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd)
 
-        # 회원가입 후 일반유저 그룹에 추가
-        general_group = Group.objects.get(name='General users')
-        general_group.user_set.add(user)
         return redirect(to='home')
 
     return render(request, 'app/signup.html')
@@ -112,8 +105,12 @@ def write(request):
         title = request.POST['title']
         content = request.POST.get('content')
         Content.user = request.user
-        Content(number=number.get('number') + 1, title=title,
-                contents=content, writer=User.get_username(Content.user)).save()
+        if number.get('number') is None:
+            Content(number=1, title=title,
+                    contents=content, writer=User.get_username(Content.user)).save()
+        else:
+            Content(number=number.get('number') + 1, title=title,
+                    contents=content, writer=User.get_username(Content.user)).save()
         return redirect(to='board')
 
     return render(request, 'app/write.html')
@@ -187,7 +184,5 @@ def user_list(request):
 
 
 def test(request):
-    G_user = User.objects.filter(groups__name='General users')
-    A_user = User.objects.filter(groups__name='admin')
-    D_user = User.objects.filter(groups__name='dormant_account')
+
     return render(request,'app/test.html', {'G_user':G_user,'A_user':A_user,'D_user':D_user,'G_cnt':len(G_user),'A_cnt':len(A_user),'D_cnt':len(D_user)})

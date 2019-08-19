@@ -78,8 +78,13 @@ WSGI_APPLICATION = 'dormant_account.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'mydb'
+        'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'test',
+            'USER': 'osunguk',
+            'PASSWORD':'xodn502gh',
+            'HOST':'localhost',
+            'PORT':'3306'
+
     }
 }
 
