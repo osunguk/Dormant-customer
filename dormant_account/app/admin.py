@@ -17,22 +17,34 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'last_login', 'check_alter')
     actions = ['grant_is_staff', 'revoke_is_staff']
 
-    list_filter = ['groups', 'last_login']
+    list_filter = ['groups', 'last_login',]
     filter_horizontal = ()
+    #search_fields = ('username','email','dormant_cnt','last_login',)
 
     def check_alter(self,obj):
 
         return Profile.objects.get(user=obj).check_alert
 
+    check_alter.boolean = True
+    check_alter.short_description ='휴면알림 유무'
     def grant_is_staff(self, request, queryset):
-        queryset.update(is_staff = True)
+
+        for z in queryset:
+
+            x = User.objects.get(username=z).id
+            Profile.objects.filter(user_id= x).update(check_alert=True)
+        #queryset.update(check_alter = True)
         self.message_user(request, " changed successfully ." )
-    grant_is_staff.short_description = '스태프권한 부여'
+    grant_is_staff.short_description = '휴면알림 완료'
 
     def revoke_is_staff(self, request, queryset):
-        queryset.update(is_staff = False)
-        self.message_user(request, " changed successfully ." )
-    revoke_is_staff.short_description = '스태프권한 제거'
+        for z in queryset:
+            x = User.objects.get(username=z).id
+            Profile.objects.filter(user_id=x).update(check_alert=False)
+        # queryset.update(check_alter = True)
+        self.message_user(request, " changed successfully .")
+    revoke_is_staff.short_description = '휴면알림 미완료'
+
 '''
 class CustomAdmin(admin.ModelAdmin):
     list_display = ('id', 'email')
