@@ -20,12 +20,19 @@ class Content(models.Model):
 
 
 class Profile(models.Model):
+    BUSINESS = 1
+    CUSTOMER = 2
+    ROLE_CHOICES = (
+        (BUSINESS, 'Business'),
+        (CUSTOMER, 'Customer')
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
     check = models.CharField('check', max_length=100, blank=True)
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
 
     def __str__(self):
-        return str(self.user)
+        return str(self.user.username)
 
 
 class DormantUserC(models.Model):
@@ -49,7 +56,6 @@ class DormantUserInfo(models.Model):
     dormantDate = models.DateTimeField(default=timezone.now)
     deleteDate = models.DateTimeField(blank=True)
     checkNotice = models.BooleanField(default=False)
-
 
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드

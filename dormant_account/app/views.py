@@ -7,9 +7,11 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Max
 import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
 
 """
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
 # 휴면계정 알림
 def dormant_Alert():
     user_list = User.objects.values()
