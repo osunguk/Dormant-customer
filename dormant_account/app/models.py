@@ -25,7 +25,7 @@ class Profile(models.Model):
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
 
     def __str__(self):
-        return str(self.dormant_cnt)
+        return str(self.user)
 
 
 class DormantUserC(models.Model):
@@ -38,7 +38,7 @@ class DormantUserC(models.Model):
 
 class DormantUserB(models.Model):
     email = models.CharField('이메일', max_length=100)
-    businessNumber = models.IntegerField('핸드폰 번호', max_length=11)
+    businessNumber = models.IntegerField('사업자 번호', max_length=11)
     phoneNumber = models.IntegerField('핸드폰 번호', max_length=15)
     name = models.CharField('ID', max_length=100)
     point = models.IntegerField('보유 포인트', max_length=100000)
@@ -48,6 +48,8 @@ class DormantUserInfo(models.Model):
     lastLogin = models.DateTimeField(blank=True)
     dormantDate = models.DateTimeField(default=timezone.now)
     deleteDate = models.DateTimeField(blank=True)
+    checkNotice = models.BooleanField(default=False)
+
 
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Content, Profile
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.contrib import auth
 
 from django.utils import timezone
