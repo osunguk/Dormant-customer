@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Content, Profile
+from .models import Content, Profile, DormantUserInfo
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -45,6 +45,10 @@ class UserAdmin(BaseUserAdmin):
         # queryset.update(check_alter = True)
         self.message_user(request, " changed successfully .")
     revoke_is_staff.short_description = '휴면알림 미완료'
+
+
+class DormantUserInfoAdmin(admin.ModelAdmin):
+    list_display = ('username','deleteDate','checkNotice')
 
 '''
 class CustomAdmin(admin.ModelAdmin):
@@ -95,5 +99,5 @@ admin.site.register(Profile,ProfileAdmin)
 '''
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
+admin.site.register(DormantUserInfo,DormantUserInfoAdmin)
 

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Content, Profile
+from .models import Content, Profile, DormantUserInfo
 from django.contrib.auth.models import User
 from django.contrib import auth
 
@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Max
 import datetime
 
-"""
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
@@ -32,8 +32,6 @@ def dormant_Alert():
 # 휴면계정 전환
 def change_AccountGroup():
     user_list = User.objects.values()
-    dormant_group = Group.objects.get(name='dormant_account')
-    general_group = Group.objects.get(name='General users')
     for users in user_list:
         user = User.objects.get(username=users['username'])  # 유저리스트에서 username 가져옴
         last_login = users['last_login']
@@ -44,8 +42,14 @@ def change_AccountGroup():
 
         # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
         if (now - last_login).days >= 365:
-            dormant_group.user_set.add(user)
-            user.groups.remove(general_group)
+            U = User.objects.get(username=user) # 일반계정의 데이터를 휴면계정으로 옮김
+            dormant = DormantUserInfo() # 생성할 휴면계정
+            dormant.id = U.id
+            dormant.lastLogin = last_login
+            dormant.deleteDate = timezone.now()
+            dormant.username = U.username
+            dormant.save()
+            U.delete()
             # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
 
 
@@ -54,7 +58,7 @@ sched.add_job(change_AccountGroup, 'interval', seconds=3)
 sched.add_job(dormant_Alert, 'interval', seconds=3)
 sched.start()
 
-"""
+
 def home(request):
     return render(request, 'app/home.html')
 
@@ -65,16 +69,18 @@ def login(request):
         pwd = request.POST.get('pwd')
         user = auth.authenticate(request, username=name, password=pwd)  # 인증
 
-        print(type(user))
-        User.objects.filter(username=name).update(last_login=timezone.now())
-
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
-
+        check_DormantAccount = DormantUserInfo.objects.filter(username=name).exists() # 휴면계정 확인
+        if check_DormantAccount: # 휴면걔정 삭제 & 일반 계정 생성
+            d = DormantUserInfo.objects.get(username=name)
+            User.objects.create_user(username=d.username, password=pwd, last_login=timezone.now())
+            d.delete()
+            user = auth.authenticate(request, username=name, password=pwd)
         if user is not None:
-            Profile.objects.filter(user_id=user.id).update(check='')
-            check_DormantAccount = user.groups.filter(name='dormant_account').exists()
             auth.login(request, user)
+            Profile.objects.filter(user_id=user.id).update(check='')
+            User.objects.filter(username=name).update(last_login=timezone.now())  # 마지막 로그인 시간 최신화
             return render(request, 'app/board.html',
                           {'check_DormantAccount': check_DormantAccount, 'contents': content_all,
                            'total': total_content})
