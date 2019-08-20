@@ -68,7 +68,6 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
     check = models.CharField('check', max_length=100, blank=True)
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
-
     memo = models.TextField('memo', max_length=300, blank=True)
     check_alert = models.BooleanField('check_alter', default=False, blank=True)
     role_profile = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
