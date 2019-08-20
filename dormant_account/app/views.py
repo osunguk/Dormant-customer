@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Content, Profile, DormantUserInfo
+from .models import Content, Profile, DormantUserInfo, UserB, UserC
 from django.contrib.auth.models import User
 from django.contrib import auth
 
@@ -98,13 +98,18 @@ def logout(request):
 def signup(request):
     if request.method == 'POST':
         username = request.POST['name']
+        check_id = User.objects.filter(username=username).exists()
+        if check_id:  # id가 중복일때 signup 거부
+            pass
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
 
-        if request.POST.get('type') == 'Business' :
-            return redirect(to='business')
+        if request.POST.get('type') == 'Business':
+            type = business
+            return render(request,'app/business.html',{'type':type})
         else:
-            return redirect(to='customer')
+            type = customer
+            return render(request, 'app/customer.html', {'type': type})
 
     return render(request, 'app/signup.html')
 
@@ -193,17 +198,32 @@ def user_list(request):
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
 
+
 def customer(request):
     if request.method == 'POST':
         kakao_id = request.POST['kakao_id']
-
+        print('working2')
+        u = UserC()
+        u.kakao_Id = kakao_id
+        u.mining_point = 0
+        u.user_c = request.user
+        u.save()
 
         return render(request, 'app/home.html', {'kakao_id' : kakao_id})
     return render(request, 'app/customer.html')
 
+
 def business(request):
     if request.method == 'POST':
         business_num = request.POST['business_num']
+        company_name = request.POST['company_name']
+        print('working')
+        u = UserB()
+        u.business_number = business_num
+        u.company_name = company_name
+        u.star_point = 0
+        u.user_b = request.user
+        u.save()
 
         return render(request, 'app/home.html', {'business_num' : business_num})
 
