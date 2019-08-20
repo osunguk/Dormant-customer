@@ -183,8 +183,3 @@ def user_list(request):
             sentence = u.username + '는 휴면계정입니다'
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
-
-
-def test(request):
-
-    return render(request,'app/test.html', {'G_user':G_user,'A_user':A_user,'D_user':D_user,'G_cnt':len(G_user),'A_cnt':len(A_user),'D_cnt':len(D_user)})
