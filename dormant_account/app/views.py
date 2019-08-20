@@ -1,9 +1,5 @@
 from django.shortcuts import render, redirect
-<<<<<<< HEAD
 from .models import Content, Profile, DormantUserInfo, UserB, UserC
-=======
-from .models import Content, Profile, DormantUserInfo
->>>>>>> master
 from django.contrib.auth.models import User
 from django.contrib import auth
 
@@ -107,21 +103,12 @@ def signup(request):
             pass
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
-
-<<<<<<< HEAD
         if request.POST.get('type') == 'Business':
             type = business
             return render(request,'app/business.html',{'type':type})
         else:
             type = customer
             return render(request, 'app/customer.html', {'type': type})
-=======
-        if request.POST.get('type') == 'Business' :
-            return redirect(to='business')
-        else:
-            return redirect(to='customer')
->>>>>>> master
-
     return render(request, 'app/signup.html')
 
 
@@ -209,8 +196,6 @@ def user_list(request):
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
 
-<<<<<<< HEAD
-
 def customer(request):
     if request.method == 'POST':
         kakao_id = request.POST['kakao_id']
@@ -220,17 +205,11 @@ def customer(request):
         u.mining_point = 0
         u.user_c = request.user
         u.save()
-=======
-def customer(request):
-    if request.method == 'POST':
-        kakao_id = request.POST['kakao_id']
 
->>>>>>> master
 
         return render(request, 'app/home.html', {'kakao_id' : kakao_id})
     return render(request, 'app/customer.html')
 
-<<<<<<< HEAD
 
 def business(request):
     if request.method == 'POST':
@@ -243,12 +222,6 @@ def business(request):
         u.star_point = 0
         u.user_b = request.user
         u.save()
-=======
-def business(request):
-    if request.method == 'POST':
-        business_num = request.POST['business_num']
->>>>>>> master
-
         return render(request, 'app/home.html', {'business_num' : business_num})
 
     return render(request, 'app/business.html')
