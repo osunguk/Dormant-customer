@@ -1,11 +1,13 @@
 from django.contrib import admin
-from .models import Content, Profile
+from .models import Content, Profile, DormantUserInfo, UserB, UserC
+from django.utils import timezone
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.contrib import messages
+import datetime
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
-admin.site.index_title = 'ZEROGO User'
+admin.site.index_title = 'ZEROGO Management'
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
@@ -14,19 +16,64 @@ class ProfileInline(admin.StackedInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'last_login', 'is_staff')
-    actions = ['grant_is_staff', 'revoke_is_staff']
-    inlines = (ProfileInline, )
-    def grant_is_staff(self, request, queryset):
-        queryset.update(is_staff = True)
-        self.message_user(request, " changed successfully ." )
-    grant_is_staff.short_description = '스태프권한 부여'
+    inlines = (ProfileInline,)
+    list_display = ('username', 'email', 'last_login', 'check_alter')
+    actions = ['is_alert', 'is_unalert', 'add_memo']
 
-    def revoke_is_staff(self, request, queryset):
-        queryset.update(is_staff = False)
-        self.message_user(request, " changed successfully ." )
-    revoke_is_staff.short_description = '스태프권한 제거'
+    list_filter = ['groups', 'last_login',]
+    filter_horizontal = ()
+    #search_fields = ('username','email','dormant_cnt','last_login',)
 
+    def check_alter(self,obj):
+
+        return Profile.objects.get(user=obj).check_alert
+
+    check_alter.boolean = True
+    check_alter.short_description ='휴면알림 유무'
+    def is_alert(self, request, queryset):
+        count = 0
+        for z in queryset:
+
+            x = User.objects.get(username=z).id
+            Profile.objects.filter(user_id= x).update(check_alert=True)
+            count += 1
+        #queryset.update(check_alter = True)
+        self.message_user(request, " {} 명의 휴면알림을 완료로 변경하였습니다 .".format(count) )
+    is_alert.short_description = '휴면알림 완료'
+
+    def is_unalert(self, request, queryset):
+        count = 0
+        for z in queryset:
+            x = User.objects.get(username=z).id
+            Profile.objects.filter(user_id=x).update(check_alert=False)
+            count += 1
+        # queryset.update(check_alter = True)
+        self.message_user(request, " {} 명의 휴면알림을 미완료로 변경하였습니다 .".format(count))
+    is_unalert.short_description = '휴면알림 미완료'
+
+    def add_memo(self, request, queryset):  #코드 리펙토링 할 것!
+        count = 0
+        def dormant_Alert():
+            user_list = User.objects.values()
+            for users in user_list:
+                u = User.objects.get(id=users['id'])
+                now = datetime.datetime.now(timezone.utc)
+                last_login = users['last_login']
+                if last_login is None:
+                    last_login = users['date_joined']
+                return (datetime.timedelta(days=335) + last_login - now) # 계정 전환 남은기간 계산
+
+        for z in queryset:
+
+            x = User.objects.get(username=z).id
+            Profile.objects.filter(user_id=x).update(memo='사전알림 날짜 : '+ str(dormant_Alert()))
+            count += 1
+        self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
+    add_memo.short_description = '사전알림 날짜 추가'
+
+class DormantUserInfoAdmin(admin.ModelAdmin):
+    list_display = ('username','deleteDate','checkNotice')
+'''
 class CustomAdmin(admin.ModelAdmin):
     list_display = ('id', 'email')
     list_editable = ('permission',)
@@ -34,26 +81,55 @@ class CustomAdmin(admin.ModelAdmin):
     search_fields = ('username',)
 
 
-"""
-class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_location')
-    list_select_related = ('profile', )
+    list_display = ['username','id','date_joined','dormant_date']
 
-    def get_location(self, instance):
-        return instance.profile.location
-    get_location.short_description = 'Location'
-
-    def get_inline_instances(self, request, obj=None):
-        if not obj:
-            return list()
-        return super(CustomUserAdmin, self).get_inline_instances(request, obj)
-"""
+    def dormant_date(self,obj):
+        return Profile.objects.get(user=obj).dormant_cnt
 
 
+<<<<<<< HEAD
+=======
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'check', 'dormant_cnt','check_alert')
+    list_filter = ('user', 'check_alert')
+    actions = ['Test','is_check', 'is_uncheck']
+    #search_fields = ('dormant_cnt')
 
+    def get_user(self, obj):
+        return obj.description
+    get_user.short_description = 'ID'
+
+    def Test(self, request, queryset):
+        queryset.update(dormant_cnt = 365)
+        #self.message_user((request, 'changed successfully'))
+    Test.short_description = '휴면계정 날짜 초기화'
+
+    def is_check(self, request, queryset):
+        queryset.update(check_alert = True)
+        self.message_user(request, " changed successfully ." )
+    is_check.short_description = '휴면알림 O'
+
+    def is_uncheck(self, request, queryset):
+        queryset.update(check_alert = False)
+        self.message_user(request, " changed successfully ." )
+    is_uncheck.short_description = '휴면알림 X'
+
+    def check_alert(self, check_alert):
+        return check_alert.description
+>>>>>>> 78709e909c85b8bef21dec9b3b81a2458c0e53f2
+
+    check_alert.short_description = "휴면알림 유무"
+
+admin.site.register(Content)
+<<<<<<< HEAD
+admin.site.register(Profile)
+=======
+admin.site.register(Profile,ProfileAdmin)
+'''
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(Content)
-admin.site.register(Profile)
+admin.site.register(UserC)
+admin.site.register(UserB)
+admin.site.register(DormantUserInfo,DormantUserInfoAdmin)
+
 

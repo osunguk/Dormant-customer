@@ -81,9 +81,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
             'NAME': 'test',
             'USER': 'osunguk',
-            'PASSWORD':'1234',
-            'HOST':'localhost',
-            'PORT':'3306'
+            'PASSWORD': '1234',
+            'HOST': 'localhost',
+            'PORT': '3306'
 
     }
 }
@@ -126,5 +126,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
 BROKER_URL = 'django://'

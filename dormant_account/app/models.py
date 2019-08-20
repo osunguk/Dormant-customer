@@ -62,34 +62,43 @@ class Profile(models.Model):
         (BUSINESS, 'Business'),
         (CUSTOMER, 'Customer')
     )
+    # 기본 정보
+    email = models.CharField('이메일', max_length=100, blank=True)
+    phoneNumber = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
     check = models.CharField('check', max_length=100, blank=True)
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
 
-    memo = models.TextField('memo', max_length=300)
-    #check_alert = models.BooleanField(default=False)
+    memo = models.TextField('memo', max_length=300, blank=True)
+    check_alert = models.BooleanField('check_alter', default=False, blank=True)
+    role_profile = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
 
     def __str__(self):
         return str(self.user.username)
 
-"""
-class DormantUserC(models.Model):
-    email = models.CharField('이메일', max_length=100)
-    kakaoId = models.CharField('카카오톡 아이디', max_length=100)
-    phoneNumber = models.IntegerField('핸드폰 번호', max_length=15)
-    name = models.CharField('ID', max_length=100)
-    point = models.IntegerField('보유 포인트', max_length=100000)
+
+class UserC(models.Model):
+    user_c = models.ForeignKey(User, on_delete=models.CASCADE)
+    kakao_Id = models.CharField('카카오톡 아이디', max_length=100)
+    mining_point = models.IntegerField('보유 포인트', default=0)
 
 
-class DormantUserB(models.Model):
-    email = models.CharField('이메일', max_length=100)
-    businessNumber = models.IntegerField('사업자 번호', max_length=11)
-    phoneNumber = models.IntegerField('핸드폰 번호', max_length=15)
-    name = models.CharField('ID', max_length=100)
-    point = models.IntegerField('보유 포인트', max_length=100000)
-"""
+class UserB(models.Model):
+    user_b = models.ForeignKey(User, on_delete=models.CASCADE)
+    company_name = models.CharField('사업장 이름', max_length=100)
+    business_number = models.IntegerField('사업자 번호',)
+    star_point = models.IntegerField('보유 포인트', default=0)
+
 
 class DormantUserInfo(models.Model):
+    username = models.CharField('username', max_length=100, blank=True)
+    BUSINESS = 1
+    CUSTOMER = 2
+    ROLE_CHOICES = (
+        (BUSINESS, 'Business'),
+        (CUSTOMER, 'Customer')
+    )
+    role_dormant = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
     lastLogin = models.DateTimeField(blank=True)
     dormantDate = models.DateTimeField(default=timezone.now)
     deleteDate = models.DateTimeField(blank=True)
@@ -98,18 +107,6 @@ class DormantUserInfo(models.Model):
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))
-"""
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
-
-"""
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
