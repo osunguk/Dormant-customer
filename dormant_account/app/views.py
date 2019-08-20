@@ -95,7 +95,10 @@ def signup(request):
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
 
-        return redirect(to='home')
+        if request.POST.get('type') == 'Business' :
+            return redirect(to='business')
+        else:
+            return redirect(to='customer')
 
     return render(request, 'app/signup.html')
 
@@ -183,3 +186,19 @@ def user_list(request):
             sentence = u.username + '는 휴면계정입니다'
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
+
+def customer(request):
+    if request.method == 'POST':
+        kakao_id = request.POST['kakao_id']
+
+
+        return render(request, 'app/home.html', {'kakao_id' : kakao_id})
+    return render(request, 'app/customer.html')
+
+def business(request):
+    if request.method == 'POST':
+        business_num = request.POST['business_num']
+
+        return render(request, 'app/home.html', {'business_num' : business_num})
+
+    return render(request, 'app/business.html')
