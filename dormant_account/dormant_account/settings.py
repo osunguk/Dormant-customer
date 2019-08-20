@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
-    'django_celery_results',
+
 ]
 
 MIDDLEWARE = [
@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'dormant_account.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'test',
-            'USER': 'osunguk',
-            'PASSWORD':'xodn502gh',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD':'',
             'HOST':'localhost',
             'PORT':'3306'
 
@@ -128,6 +128,3 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 BROKER_URL = 'django://'
-
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
