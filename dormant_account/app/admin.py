@@ -50,31 +50,10 @@ class CustomUserAdmin(UserAdmin):
         return super(CustomUserAdmin, self).get_inline_instances(request, obj)
 """
 
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'check', 'dormant_cnt')
-    list_filter = ('user', )
-    actions = ['Test']
-    #search_fields = ('dormant_cnt')
-
-    def get_user(self, obj):
-        return obj.description
-    get_user.short_description = 'ID'
-
-    def Test(self, request, queryset):
-        queryset.update(dormant_cnt = 365)
-        #self.message_user((request, 'changed successfully'))
-    Test.short_description = '휴면계정 날짜 초기화'
-
-
-
-    list_display = ['username','id','date_joined','dormant_date']
-
-    def dormant_date(self,obj):
-        return Profile.objects.get(user=obj).dormant_cnt
 
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Content)
-admin.site.register(Profile,ProfileAdmin)
+admin.site.register(Profile)
 

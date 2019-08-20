@@ -7,6 +7,8 @@ from django.dispatch import receiver  # 위와 동문
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+
+
 class MyUserManager(BaseUserManager):
     def create_user(self, email, date_of_birth, password=None):
         """
@@ -38,6 +40,7 @@ class MyUserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
+
 
 class Content(models.Model):
     number = models.IntegerField('number', primary_key=True)
