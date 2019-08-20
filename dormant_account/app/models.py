@@ -43,14 +43,14 @@ class Profile(models.Model):
 class UserC(models.Model):
     user_c = models.ForeignKey(User, on_delete=models.CASCADE)
     kakao_Id = models.CharField('카카오톡 아이디', max_length=100)
-    mining_point = models.IntegerField('보유 포인트',)
+    mining_point = models.IntegerField('보유 포인트', default=0)
 
 
 class UserB(models.Model):
     user_b = models.ForeignKey(User, on_delete=models.CASCADE)
     company_name = models.CharField('사업장 이름', max_length=100)
     business_number = models.IntegerField('사업자 번호',)
-    star_point = models.IntegerField('보유 포인트',)
+    star_point = models.IntegerField('보유 포인트', default=0)
 
 
 class DormantUserInfo(models.Model):
