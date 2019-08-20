@@ -7,6 +7,8 @@ from django.dispatch import receiver  # 위와 동문
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+
+
 class MyUserManager(BaseUserManager):
     def create_user(self, email, date_of_birth, password=None):
         """
@@ -38,6 +40,7 @@ class MyUserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
+
 
 class Content(models.Model):
     number = models.IntegerField('number', primary_key=True)
@@ -84,6 +87,7 @@ class DormantUserB(models.Model):
     name = models.CharField('ID', max_length=100)
     point = models.IntegerField('보유 포인트', max_length=100000)
 """
+
 
 class DormantUserInfo(models.Model):
     lastLogin = models.DateTimeField(blank=True)

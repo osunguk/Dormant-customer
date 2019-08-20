@@ -79,11 +79,11 @@ WSGI_APPLICATION = 'dormant_account.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-            'NAME': '',
-            'USER': '',
-            'PASSWORD':'',
-            'HOST':'localhost',
-            'PORT':'3306'
+            'NAME': 'test',
+            'USER': 'osunguk',
+            'PASSWORD': '1234',
+            'HOST': 'localhost',
+            'PORT': '3306'
 
     }
 }

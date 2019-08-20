@@ -19,16 +19,16 @@ import app.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user_list',app.views.user_list,name='user_list'),
-    path('',app.views.home,name='home'),
-    path('login',app.views.login,name='login'),
-    path('logout',app.views.logout,name='logout'),
-    path('signup',app.views.signup,name='signup'),
-    path('write',app.views.write,name='write'),
-    path('user',app.views.user,name='user'),
-    path('board',app.views.board,name='board'),
-    path('detail/<int:number>',app.views.detail,name='detail'),
-    path('detail/<int:number>/edit',app.views.edit,name='edit'),
-    path('detail/<int:number>/delete',app.views.delete,name='delete'),
-    path('test',app.views.test,name='test')
+    path('user_list', app.views.user_list, name='user_list'),
+    path('', app.views.home, name='home'),
+    path('login', app.views.login, name='login'),
+    path('logout', app.views.logout, name='logout'),
+    path('signup', app.views.signup, name='signup'),
+    path('write', app.views.write, name='write'),
+    path('user', app.views.user, name='user'),
+    path('board', app.views.board, name='board'),
+    path('detail/<int:number>', app.views.detail, name='detail'),
+    path('detail/<int:number>/edit', app.views.edit, name='edit'),
+    path('detail/<int:number>/delete', app.views.delete, name='delete'),
+    path('test', app.views.test, name='test')
 ]

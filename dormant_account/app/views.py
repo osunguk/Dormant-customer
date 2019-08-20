@@ -93,7 +93,7 @@ def signup(request):
     if request.method == 'POST':
         username = request.POST['name']
         userpwd = request.POST['pwd']
-        user = User.objects.create_user(username=username, password=userpwd)
+        user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
 
         return redirect(to='home')
 
