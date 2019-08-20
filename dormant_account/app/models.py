@@ -4,42 +4,6 @@ from django.contrib.auth.models import User, PermissionsMixin
 
 from django.db.models.signals import post_save  # 장고의 signals로 특정 이벤트가 발생했을 때 신호를 통한 여러 작업들을 도와주는 모듈
 from django.dispatch import receiver  # 위와 동문
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
-
-
-class MyUserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, password=None):
-        """
-        Creates and saves a User with the given email, date of
-        birth and password.
-        """
-        if not email:
-            raise ValueError('Users must have an email address')
-
-        user = self.model(
-            email=self.normalize_email(email),
-            date_of_birth=date_of_birth,
-        )
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, date_of_birth, password):
-        """
-        Creates and saves a superuser with the given email, date of
-        birth and password.
-        """
-        user = self.create_user(
-            email,
-            password=password,
-            date_of_birth=date_of_birth,
-        )
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
 
 
 class Content(models.Model):
@@ -89,7 +53,7 @@ class UserB(models.Model):
     star_point = models.IntegerField('보유 포인트', default=0)
 
 
-class DormantUserInfo(models.Model):
+class DormantUserInfo(models.Model):  # 휴면계정 모델
     username = models.CharField('username', max_length=100, blank=True)
     BUSINESS = 1
     CUSTOMER = 2

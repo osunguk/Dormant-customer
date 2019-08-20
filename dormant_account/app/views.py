@@ -196,8 +196,10 @@ def user_list(request):
         result.append(sentence)
     return render(request, 'app/user_list.html', {'results':result})
 
+
 def customer(request):
     if request.method == 'POST':
+        Profile.objects.filter(user=request.user).update(role_profile=2)
         kakao_id = request.POST['kakao_id']
         print('working2')
         u = UserC()
@@ -213,6 +215,7 @@ def customer(request):
 
 def business(request):
     if request.method == 'POST':
+        Profile.objects.filter(user=request.user).update(role_profile=1)
         business_num = request.POST['business_num']
         company_name = request.POST['company_name']
         print('working')

@@ -8,6 +8,8 @@ import datetime
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
 admin.site.index_title = 'ZEROGO Management'
+
+
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
@@ -22,7 +24,7 @@ class UserAdmin(BaseUserAdmin):
 
     list_filter = ['groups', 'last_login',]
     filter_horizontal = ()
-    #search_fields = ('username','email','dormant_cnt','last_login',)
+    # search_fields = ('username','email','dormant_cnt','last_login',)
 
     def check_alter(self,obj):
 
@@ -30,6 +32,7 @@ class UserAdmin(BaseUserAdmin):
 
     check_alter.boolean = True
     check_alter.short_description ='휴면알림 유무'
+
     def is_alert(self, request, queryset):
         count = 0
         for z in queryset:
@@ -37,7 +40,7 @@ class UserAdmin(BaseUserAdmin):
             x = User.objects.get(username=z).id
             Profile.objects.filter(user_id= x).update(check_alert=True)
             count += 1
-        #queryset.update(check_alter = True)
+        # queryset.update(check_alter = True)
         self.message_user(request, " {} 명의 휴면알림을 완료로 변경하였습니다 .".format(count) )
     is_alert.short_description = '휴면알림 완료'
 
@@ -51,8 +54,9 @@ class UserAdmin(BaseUserAdmin):
         self.message_user(request, " {} 명의 휴면알림을 미완료로 변경하였습니다 .".format(count))
     is_unalert.short_description = '휴면알림 미완료'
 
-    def add_memo(self, request, queryset):  #코드 리펙토링 할 것!
+    def add_memo(self, request, queryset):  # 코드 리펙토링 할 것!
         count = 0
+
         def dormant_Alert():
             user_list = User.objects.values()
             for users in user_list:
@@ -73,6 +77,8 @@ class UserAdmin(BaseUserAdmin):
 
 class DormantUserInfoAdmin(admin.ModelAdmin):
     list_display = ('username','deleteDate','checkNotice')
+
+
 '''
 class CustomAdmin(admin.ModelAdmin):
     list_display = ('id', 'email')
@@ -87,8 +93,6 @@ class CustomAdmin(admin.ModelAdmin):
         return Profile.objects.get(user=obj).dormant_cnt
 
 
-<<<<<<< HEAD
-=======
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'check', 'dormant_cnt','check_alert')
     list_filter = ('user', 'check_alert')
@@ -116,16 +120,13 @@ class ProfileAdmin(admin.ModelAdmin):
 
     def check_alert(self, check_alert):
         return check_alert.description
->>>>>>> 78709e909c85b8bef21dec9b3b81a2458c0e53f2
-
     check_alert.short_description = "휴면알림 유무"
 
 admin.site.register(Content)
-<<<<<<< HEAD
-admin.site.register(Profile)
-=======
 admin.site.register(Profile,ProfileAdmin)
 '''
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserC)
