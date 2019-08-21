@@ -1,21 +1,20 @@
-
 from django.contrib import admin
+from django.utils import timezone
 
 from .models import Content, Profile, DormantUserInfo, UserB, UserC
 from django.utils import timezone
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-import datetime
-from django.utils import timezone
 from django.contrib import messages
+import datetime
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
-admin.site.index_title = 'ZEROGO User'
-
+admin.site.index_title = 'ZEROGO Management'
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
     verbose_name_plural = 'profile'
+    fk_name = 'user'
 
 
 class UserAdmin(BaseUserAdmin):
@@ -25,6 +24,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ['groups', 'last_login',]
     filter_horizontal = ()
     # search_fields = ('username','email','dormant_cnt','last_login',)
+
 
     def check_alter(self,obj):
 
@@ -53,6 +53,7 @@ class UserAdmin(BaseUserAdmin):
         # queryset.update(check_alter = True)
         self.message_user(request, " {} 명의 휴면알림을 미완료로 변경하였습니다 .".format(count))
     is_unalert.short_description = '휴면알림 미완료'
+
     def add_memo(self, request, queryset):  #코드 리펙토링 할 것!
 
         count = 0
@@ -118,6 +119,10 @@ class ProfileAdmin(admin.ModelAdmin):
 
     def check_alert(self, check_alert):
         return check_alert.description
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 1423bb7... 그룹오류수정
     check_alert.short_description = "휴면알림 유무"
 
 admin.site.register(Content)
