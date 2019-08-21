@@ -54,6 +54,7 @@ class UserB(models.Model):
 
 
 class DormantUserInfo(models.Model):  # 휴면계정 모델
+
     username = models.CharField('username', max_length=100, blank=True)
     BUSINESS = 1
     CUSTOMER = 2
@@ -62,11 +63,10 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
         (CUSTOMER, 'Customer')
     )
     role_dormant = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    lastLogin = models.DateTimeField(blank=True)
+    lastLogin = models.DateTimeField(blank=True, default=timezone.now())
     dormantDate = models.DateTimeField(default=timezone.now)
-    deleteDate = models.DateTimeField(blank=True)
+    deleteDate = models.DateTimeField(blank=True, default=timezone.now())
     checkNotice = models.BooleanField(default=False)
-
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))

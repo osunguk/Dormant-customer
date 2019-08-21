@@ -12,6 +12,7 @@ admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
 admin.site.index_title = 'ZEROGO User'
 
+
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
@@ -24,12 +25,9 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'last_login', 'check_alter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
     list_filter = ['groups', 'last_login',]
-    filter_horizontal = ()
     # search_fields = ('username','email','dormant_cnt','last_login',)
 
-
     def check_alter(self, obj):
-
         return Profile.objects.get(user=obj).check_alert
 
     check_alter.boolean = True
@@ -78,9 +76,6 @@ class UserAdmin(BaseUserAdmin):
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
     add_memo.short_description = '사전알림 날짜 추가'
 
-
-class DormantUserInfoAdmin(admin.ModelAdmin):
-    list_display = ('username','deleteDate','checkNotice')
 
 
 '''
@@ -135,7 +130,4 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserC)
 admin.site.register(UserB)
-admin.site.register(DormantUserInfo,DormantUserInfoAdmin)
-
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(DormantUserInfo)
