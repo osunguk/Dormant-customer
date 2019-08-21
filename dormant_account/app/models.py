@@ -27,7 +27,7 @@ class Profile(models.Model):
         (CUSTOMER, 'Customer')
     )
     # 기본 정보
-    email = models.CharField('이메일', max_length=100, blank=True)
+    email = models.EmailField('이메일', max_length=100, blank=True)
     phoneNumber = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
     check = models.CharField('check', max_length=100, blank=True)
@@ -78,6 +78,7 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     star_point = models.IntegerField('보유 별', blank=True, null=True)
     kakao_Id = models.CharField('카카오톡 아이디', max_length=100, blank=True, null=True)
     mining_point = models.IntegerField('보유 포인트', blank=True, null=True)
+
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))

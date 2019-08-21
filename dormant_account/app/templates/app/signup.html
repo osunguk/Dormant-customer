@@ -15,22 +15,50 @@
     <form method="post" action="{%url 'signup'  %}" class="was-validated">
       {% csrf_token %}
 
-    <div class="form-group">
-      <label for="name">Username:</label>
-      <input type="text" class="form-control" id="name" placeholder="Enter username" name="name" required>
+    <div class="col-lg-10">
+      <label for="name" class="col-lg-2 control-label">Username:</label>
+      <input type="text" class="form-control" id="name" placeholder="Enter username" name="name" required autofocus>
       <div class="valid-feedback">Valid.</div>
-      <div class="invalid-feedback">Please fill out this field.</div>
+      <div class="invalid-feedback">필수항목 입니다.</div>
     </div>
 
-    <div class="form-group">
-      <label for="pwd">Password:</label>
+
+
+    <div class="col-lg-10">
+      <label for="pwd" class="col-lg-2 control-label">Password:</label>
       <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd" required>
       <div class="valid-feedback">Valid.</div>
-      <div class="invalid-feedback">Please fill out this field.</div>
+      <div class="invalid-feedback">필수항목 입니다.</div><br>
     </div>
 
-<input type="radio" name="type" value="Business" /> Business
-<input type="radio" name="type" value="Customer" checked="checked" /> Customer
+
+
+    <div class="col-lg-10">
+      <label for="email" class="col-lg-2 control-label" >Email:</label>
+      <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
+        <div class="invalid-feedback">필수항목 입니다.</div><br>
+    </div>
+
+    <div class="form-group" id="divPhoneNumber">
+        <label for="inputPhoneNumber" class="col-lg-2 control-label">휴대폰 번호</label>
+        <div class="col-lg-10">
+            <input type="tel" class="form-control onlyNumber" id="phoneNumber" name ="phoneNumber" data-rule-required="true" placeholder="-를 제외하고 숫자만 입력하세요." maxlength="11" required>
+            <div class="invalid-feedback">필수항목 입니다.</div><br>
+        </div>
+    </div>
+
+
+
+    <div>
+        <h4>TYPE 선택 : </h4>
+        <input type="radio" name="type" value="Business" /> Business
+        <input type="radio" name="type" value="Customer" checked="checked" /> Customer <br><br>
+    </div>
+
+
+
+
+
 
     <div class="form-group form-check">
       <label class="form-check-label">
@@ -45,7 +73,18 @@
 
     <p><a href="{% url 'home' %}">home</a></p>
   </form>
+
+
 </div>
+    <script>
+            $(".onlyNumber").keyup(function(event){
+            if (!(event.keyCode >=37 && event.keyCode<=40)) {
+                var inputVal = $(this).val();
+                $(this).val(inputVal.replace(/[^0-9]/gi,''));
+            }
+        });
+
+    </script>
 
 </body>
 </html>
