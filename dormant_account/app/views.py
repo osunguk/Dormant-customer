@@ -45,13 +45,18 @@ def change_AccountGroup():
 
         # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
         if (now - last_login).days >= 365:
-            """
             U = User.objects.get(username=user) # 일반계정의 데이터를 휴면계정으로 옮김
             dormant = DormantUserInfo() # 생성할 휴면계정
             dormant.id = U.id
             dormant.lastLogin = last_login
-            dormant.deleteDate = timezone.now()
+            dormant.dormantDate = last_login + datetime.timedelta(days=365)
+            if Profile.objects.get(user=U).role_profile == 1:
+                dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=1780)
+            else:
+                dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=365)
             dormant.username = U.username
+            dormant.email = Profile.objects.get(user=U).email
+            dormant.phoneNumber = Profile.objects.get(user=U).phoneNumber
             dormant.role_dormant = Profile.objects.get(user=U).role_profile
             if dormant.role_dormant == 1:  # 비즈니스
                  ub = UserB.objects.get(user_b=U)
@@ -64,15 +69,23 @@ def change_AccountGroup():
                 dormant.mining_point = uc.mining_point
             else:
                 pass
-
             dormant.save()
             U.delete()
-            # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')"""
+            # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
+
+def dormant_process():
+    user_list = DormantUserInfo.objects.values()
+    for user in user_list:
+        if user['deleteDate'] - timezone.now() < datetime.timedelta(days=0):
+            d = DormantUserInfo.objects.get(username=user['username'])
+            print(d.username+' : 삭제')
+            # d.delete()
 
 
 sched = BackgroundScheduler()
 sched.add_job(change_AccountGroup, 'interval', seconds=3)
 sched.add_job(dormant_Alert, 'interval', seconds=3)
+sched.add_job(dormant_process, 'interval', seconds=3)
 sched.start()
 
 
@@ -88,22 +101,41 @@ def login(request):
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
-        """
         check_DormantAccount = DormantUserInfo.objects.filter(username=name).exists() # 휴면계정 확인
 
         if check_DormantAccount: # 휴면계정 삭제 & 일반 계정 생성
             d = DormantUserInfo.objects.get(username=name)
             User.objects.create_user(username=d.username, password=pwd, last_login=timezone.now())
-            d.delete()
+            u = Profile.objects.get(user=User.objects.get(username=name))
+            u.email = d.email
+            u.phoneNumber = d.phoneNumber
+            u.role_profile = d.role_dormant
+            if d.role_dormant == 1:
+                b = UserB()
+                b.user_b = User.objects.get(username=name)
+                b.company_name = d.company_name
+                b.business_number = d.business_number
+                b.star_point = d.star_point
+                b.save()
+            elif d.role_dormant == 2:
+                c = UserC()
+                c.user_c = User.objects.get(username=name)
+                c.kakao_Id = d.kakao_Id
+                c.mining_point = d.mining_point
+                c.save()
+            else:
+                pass
+            u.save()
             user = auth.authenticate(request, username=name, password=pwd)
-        """
+            d.delete()
+
         if user is not None:
             auth.login(request, user)
             Profile.objects.filter(user_id=user.id).update(check='')
             User.objects.filter(username=name).update(last_login=timezone.now())  # 마지막 로그인 시간 최신화
             return render(request, 'app/board.html',
                           {'contents': content_all,
-                           'total': total_content})
+                           'total': total_content,'check_DormantAccount':check_DormantAccount})
         else:
             return render(request, 'app/login.html', {'error': '잘못된 id 또는 pwd 입니다'})
     else:
@@ -126,7 +158,7 @@ def signup(request):
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
 
-        user_list = User.objects.values()
+
         Profile.objects.filter(user_id=user).update(email=email)
         Profile.objects.filter(user_id=user).update(phoneNumber=phoneNumber)
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils import timezone
 from .models import Content, Profile, DormantUserInfo, UserB, UserC
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, UserAdmin
 from django.contrib.auth.models import User
 import datetime
 from app.filters import dormantNotice_day_filter
@@ -13,21 +13,55 @@ admin.site.index_title = 'ZEROGO User'
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
-    verbose_name_plural = 'profile'
+    verbose_name_plural = '프로필'
     fk_name = 'user'
 
-class UserAdmin(BaseUserAdmin):
-    inlines = (ProfileInline,)
-    list_display = ('username', 'email', 'last_login', 'check_alter', 'type','dormant_cnt', 'dormantNotice_day_filter')
-    actions = ['is_alert', 'is_unalert', 'add_memo']
-    # , admin.BooleanFieldListFilter
-    list_filter = ('groups', 'last_login',dormantNotice_day_filter)
 
-    # search_fields = ('username','email','dormant_cnt','last_login',)
+class UserCInline(admin.StackedInline):
+    model = UserC
+    can_delete = False
+    verbose_name_plural = '세부정보'
+    fk_name = 'user_c'
+    extra = 0
+
+
+class UserBInline(admin.StackedInline):
+    model = UserB
+    can_delete = False
+    verbose_name_plural = '세부정보'
+    fk_name = 'user_b'
+    extra = 0
+
+
+class UserAdmin(BaseUserAdmin):
+
+    inlines = (ProfileInline, UserCInline, UserBInline,)
+    list_display = ('username', '_email', 'last_login', 'type', 'phone_number',
+                    'check_alter', 'business_number', 'company_name', 'kakao_Id')
+    actions = ['is_alert', 'is_unalert', 'add_memo']
+    list_filter = ['groups', 'last_login',]
+    search_fields = ['username', 'profile__email', 'profile__phoneNumber',
+                     'userc__kakao_Id', 'userb__company_name', 'userb__business_number']
+
     date_hierarchy = 'last_login'
 
+    fieldsets = (
+        (None, {'fields': ('username',)}),
+        (('시간 DATA'), {'fields': ('last_login', 'date_joined')}),
+    )
+
+    def _email(self, obj):
+        return Profile.objects.get(user=obj).email
+    def phone_number(self, obj):
+        return Profile.objects.get(user=obj).phoneNumber
     def check_alter(self, obj):
         return Profile.objects.get(user=obj).check_alert
+    def business_number(self, obj):
+        return UserB.objects.get(user_b=obj).business_number
+    def company_name(self, obj):
+        return UserB.objects.get(user_b=obj).company_name
+    def kakao_Id(self, obj):
+        return UserC.objects.get(user_c=obj).kakao_Id
 
     check_alter.boolean = True
     check_alter.short_description = '휴면알림 유무'
