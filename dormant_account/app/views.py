@@ -42,6 +42,7 @@ def change_AccountGroup():
 
         # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
         if (now - last_login).days >= 365:
+            """
             U = User.objects.get(username=user) # 일반계정의 데이터를 휴면계정으로 옮김
             dormant = DormantUserInfo() # 생성할 휴면계정
             dormant.id = U.id
@@ -50,7 +51,7 @@ def change_AccountGroup():
             dormant.username = U.username
             dormant.save()
             U.delete()
-            # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
+            # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')"""
 
 
 sched = BackgroundScheduler()
@@ -71,18 +72,21 @@ def login(request):
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
+        """
         check_DormantAccount = DormantUserInfo.objects.filter(username=name).exists() # 휴면계정 확인
-        if check_DormantAccount: # 휴면걔정 삭제 & 일반 계정 생성
+
+        if check_DormantAccount: # 휴면계정 삭제 & 일반 계정 생성
             d = DormantUserInfo.objects.get(username=name)
             User.objects.create_user(username=d.username, password=pwd, last_login=timezone.now())
             d.delete()
             user = auth.authenticate(request, username=name, password=pwd)
+        """
         if user is not None:
             auth.login(request, user)
             Profile.objects.filter(user_id=user.id).update(check='')
             User.objects.filter(username=name).update(last_login=timezone.now())  # 마지막 로그인 시간 최신화
             return render(request, 'app/board.html',
-                          {'check_DormantAccount': check_DormantAccount, 'contents': content_all,
+                          {'contents': content_all,
                            'total': total_content})
         else:
             return render(request, 'app/login.html', {'error': '잘못된 id 또는 pwd 입니다'})
@@ -98,11 +102,19 @@ def logout(request):
 def signup(request):
     if request.method == 'POST':
         username = request.POST['name']
+        email = request.POST['email']
+        phoneNumber = request.POST['phoneNumber']
         check_id = User.objects.filter(username=username).exists()
         if check_id:  # id가 중복일때 signup 거부
             pass
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
+
+        user_list = User.objects.values()
+        for users in user_list:
+            Profile.objects.filter(user_id=users['id']).update(email=email)
+            Profile.objects.filter(user_id=users['id']).update(phoneNumber=phoneNumber)
+
         if request.POST.get('type') == 'Business':
             type = business
             return render(request,'app/business.html',{'type':type})
