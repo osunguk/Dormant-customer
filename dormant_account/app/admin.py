@@ -17,13 +17,20 @@ class ProfileInline(admin.StackedInline):
     verbose_name_plural = 'profile'
     fk_name = 'user'
 
+
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
-    list_display = ('username', 'email', 'last_login', 'check_alter', 'type')
+    list_display = ('username', '_email', 'last_login', 'check_alter', 'type', 'phone_number')
     actions = ['is_alert', 'is_unalert', 'add_memo']
     list_filter = ['groups', 'last_login',]
     # search_fields = ('username','email','dormant_cnt','last_login',)
     date_hierarchy = 'last_login'
+
+    def _email(self, obj):
+        return Profile.objects.get(user=obj).email
+
+    def phone_number(self, obj):
+        return Profile.objects.get(user=obj).phoneNumber
 
     def check_alter(self, obj):
         return Profile.objects.get(user=obj).check_alert
