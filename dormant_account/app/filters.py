@@ -1,9 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from .models import Profile
-
-
 class dormantNotice_day_filter(admin.SimpleListFilter):
     title = '휴면알림 60일 전'
     parameter_name = 'day_filter'
@@ -23,6 +20,7 @@ class dormantNotice_day_filter(admin.SimpleListFilter):
             return queryset.filter(profile__dormantNotice_day_filter=False)
 
         return queryset.all()
+
 
 class check_alert(admin.SimpleListFilter):
     title = '휴면알림 유무'
