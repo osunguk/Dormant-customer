@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User, PermissionsMixin
+from django.utils.timezone import now
 
 from django.db.models.signals import post_save  # 장고의 signals로 특정 이벤트가 발생했을 때 신호를 통한 여러 작업들을 도와주는 모듈
 from django.dispatch import receiver  # 위와 동문
@@ -69,9 +70,9 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
         (CUSTOMER, 'Customer')
     )
     role_dormant = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    lastLogin = models.DateTimeField(blank=True, default=timezone.now())
+    lastLogin = models.DateTimeField(blank=True, default=now)
     dormantDate = models.DateTimeField(default=timezone.now)
-    deleteDate = models.DateTimeField(blank=True, default=timezone.now())
+    deleteDate = models.DateTimeField(blank=True, default=now)
     checkNotice = models.BooleanField(default=False)
     company_name = models.CharField('사업장 이름', max_length=100, blank=True, null=True)
     business_number = models.IntegerField('사업자 번호', blank=True, null=True)
