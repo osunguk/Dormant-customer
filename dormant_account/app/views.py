@@ -46,7 +46,11 @@ def change_AccountGroup():
             dormant = DormantUserInfo() # 생성할 휴면계정
             dormant.id = U.id
             dormant.lastLogin = last_login
-            dormant.deleteDate = timezone.now()
+            dormant.dormantDate = last_login + datetime.timedelta(days=365)
+            if Profile.objects.get(user=U).role_profile == 1:
+                dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=1780)
+            else:
+                dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=365)
             dormant.username = U.username
             dormant.email = Profile.objects.get(user=U).email
             dormant.phoneNumber = Profile.objects.get(user=U).phoneNumber
@@ -66,10 +70,19 @@ def change_AccountGroup():
             U.delete()
             # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
 
+def dormant_process():
+    user_list = DormantUserInfo.objects.values()
+    for user in user_list:
+        if user['deleteDate'] - timezone.now() < datetime.timedelta(days=0):
+            d = DormantUserInfo.objects.get(username=user['username'])
+            print(d.username+' : 삭제')
+            # d.delete()
+
 
 sched = BackgroundScheduler()
 sched.add_job(change_AccountGroup, 'interval', seconds=3)
 sched.add_job(dormant_Alert, 'interval', seconds=3)
+sched.add_job(dormant_process, 'interval', seconds=3)
 sched.start()
 
 
