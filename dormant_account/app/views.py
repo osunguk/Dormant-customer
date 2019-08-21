@@ -27,6 +27,8 @@ def dormant_Alert():
         if dormant_Time.days <= 30 :  # 휴면계정 변환 30일 전 알림
             if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
                 Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
+        if dormant_Time.days <= 60:  # 계정 전환 60일 전 (나중에 함수 따로 만들것)
+            Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
 
 
 # 휴면계정 전환

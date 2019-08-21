@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import Content, Profile, DormantUserInfo, UserB, UserC
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, UserAdmin
 from django.contrib.auth.models import User
+from .filters import dormantNotice_day_filter, check_alert
 import datetime
 
 
@@ -36,10 +37,10 @@ class UserBInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline, UserCInline, UserBInline,)
-    list_display = ('username', '_email', 'last_login', 'type', 'phone_number',
-                    'check_alter', 'business_number', 'company_name', 'kakao_Id')
+    list_display = ('username', 'type', '_email', 'phone_number', 'business_number', 'company_name', 'kakao_Id'
+                    , 'last_login', 'check_alert' , 'dormantNotice_day_filter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
-    list_filter = ['groups', 'last_login',]
+    list_filter = ['groups', 'last_login', dormantNotice_day_filter, check_alert ]
     search_fields = ['username', 'profile__email', 'profile__phoneNumber',
                      'userc__kakao_Id', 'userb__company_name', 'userb__business_number']
     date_hierarchy = 'last_login'
@@ -49,11 +50,19 @@ class UserAdmin(BaseUserAdmin):
         (('시간 DATA'), {'fields': ('last_login', 'date_joined')}),
     )
 
+    def dormant_cnt(self, obj):
+        return Profile.objects.get(user=obj).dormant_cnt
+
+    def dormantNotice_day_filter(self, obj):
+        return Profile.objects.get(user=obj).dormantNotice_day_filter
+    dormantNotice_day_filter.boolean = True
+    dormantNotice_day_filter.short_description = '휴면전환 60일 전'
+
     def _email(self, obj):
         return Profile.objects.get(user=obj).email
     def phone_number(self, obj):
         return Profile.objects.get(user=obj).phoneNumber
-    def check_alter(self, obj):
+    def check_alert(self, obj):
         return Profile.objects.get(user=obj).check_alert
     def business_number(self, obj):
         return UserB.objects.get(user_b=obj).business_number
@@ -62,8 +71,8 @@ class UserAdmin(BaseUserAdmin):
     def kakao_Id(self, obj):
         return UserC.objects.get(user_c=obj).kakao_Id
 
-    check_alter.boolean = True
-    check_alter.short_description = '휴면알림 유무'
+    check_alert.boolean = True
+    check_alert.short_description = '휴면알림 유무'
 
     def is_alert(self, request, queryset):
         count = 0
