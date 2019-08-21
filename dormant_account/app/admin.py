@@ -47,7 +47,6 @@ class UserAdmin(BaseUserAdmin):
     def type(self, obj):
         return Profile.objects.get(user=obj).role_profile
 
-
     def is_unalert(self, request, queryset):
         count = 0
         for z in queryset:
@@ -83,11 +82,10 @@ class UserAdmin(BaseUserAdmin):
 
 class UserCAdmin(admin.ModelAdmin):
     list_display = ['user_c', 'kakao_Id', 'mining_point']
-
-
 class UserBAdmin(admin.ModelAdmin):
     list_display = ['user_b', 'company_name', 'business_number', 'star_point']
-
+class DormantUserInfoAdmin(admin.ModelAdmin):
+    list_display = ['username','lastLogin','dormantDate','deleteDate']
 
 '''
 class CustomAdmin(admin.ModelAdmin):
@@ -141,4 +139,4 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserC, UserCAdmin)
 admin.site.register(UserB, UserBAdmin)
-admin.site.register(DormantUserInfo)
+admin.site.register(DormantUserInfo,DormantUserInfoAdmin)

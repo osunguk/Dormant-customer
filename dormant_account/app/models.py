@@ -41,19 +41,25 @@ class Profile(models.Model):
 
 
 class UserC(models.Model):
+    class Meta:
+        verbose_name_plural = "커스텀 사용자"
     user_c = models.ForeignKey(User, on_delete=models.CASCADE)
     kakao_Id = models.CharField('카카오톡 아이디', max_length=100)
     mining_point = models.IntegerField('보유 포인트', default=0)
 
 
 class UserB(models.Model):
+    class Meta:
+        verbose_name_plural = "비즈니스 사용자"
     user_b = models.ForeignKey(User, on_delete=models.CASCADE)
     company_name = models.CharField('사업장 이름', max_length=100)
     business_number = models.IntegerField('사업자 번호',)
-    star_point = models.IntegerField('보유 포인트', default=0)
+    star_point = models.IntegerField('보유 별', default=0)
 
 
 class DormantUserInfo(models.Model):  # 휴면계정 모델
+    class Meta:
+        verbose_name_plural = "휴면 계정"
 
     username = models.CharField('username', max_length=100, blank=True)
     BUSINESS = 1
@@ -67,6 +73,11 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     dormantDate = models.DateTimeField(default=timezone.now)
     deleteDate = models.DateTimeField(blank=True, default=timezone.now())
     checkNotice = models.BooleanField(default=False)
+    company_name = models.CharField('사업장 이름', max_length=100, blank=True, null=True)
+    business_number = models.IntegerField('사업자 번호', blank=True, null=True)
+    star_point = models.IntegerField('보유 별', blank=True, null=True)
+    kakao_Id = models.CharField('카카오톡 아이디', max_length=100, blank=True, null=True)
+    mining_point = models.IntegerField('보유 포인트', blank=True, null=True)
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))

@@ -43,13 +43,24 @@ def change_AccountGroup():
         # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
         if (now - last_login).days >= 365:
             U = User.objects.get(username=user) # 일반계정의 데이터를 휴면계정으로 옮김
-            print(U)
             dormant = DormantUserInfo() # 생성할 휴면계정
             dormant.id = U.id
             dormant.lastLogin = last_login
             dormant.deleteDate = timezone.now()
             dormant.username = U.username
-            print(dormant)
+            dormant.role_dormant = Profile.objects.get(user=U).role_profile
+            if dormant.role_dormant == 1:  # 비즈니스
+                 ub = UserB.objects.get(user_b=U)
+                 dormant.company_name = ub.company_name
+                 dormant.business_number = ub.business_number
+                 dormant.star_point = ub.star_point
+            elif dormant.role_dormant == 2:  # 커스텀
+                uc = UserC.objects.get(user_c=U)
+                dormant.kakao_Id = uc.kakao_Id
+                dormant.mining_point = uc.mining_point
+            else:
+                pass
+
             dormant.save()
             U.delete()
             # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
