@@ -36,6 +36,7 @@ class Profile(models.Model):
     memo = models.TextField('memo', max_length=300, blank=True)
     check_alert = models.BooleanField('check_alter', default=False, blank=True)
     role_profile = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
+    dormantNotice_day_filter = models.BooleanField('dormantNotice_day_filter', default=False, blank=True)
 
     def __str__(self):
         return str(self.user.username)

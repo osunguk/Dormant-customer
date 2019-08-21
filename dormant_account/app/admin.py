@@ -4,12 +4,11 @@ from .models import Content, Profile, DormantUserInfo, UserB, UserC
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 import datetime
-
+from app.filters import dormantNotice_day_filter
 
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
 admin.site.index_title = 'ZEROGO User'
-
 
 class ProfileInline(admin.StackedInline):
     model = Profile
@@ -19,9 +18,11 @@ class ProfileInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
-    list_display = ('username', 'email', 'last_login', 'check_alter', 'type')
+    list_display = ('username', 'email', 'last_login', 'check_alter', 'type','dormant_cnt', 'dormantNotice_day_filter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
-    list_filter = ['groups', 'last_login',]
+    # , admin.BooleanFieldListFilter
+    list_filter = ('groups', 'last_login',dormantNotice_day_filter)
+
     # search_fields = ('username','email','dormant_cnt','last_login',)
     date_hierarchy = 'last_login'
 
@@ -41,6 +42,15 @@ class UserAdmin(BaseUserAdmin):
         self.message_user(request, " {} 명의 휴면알림을 완료로 변경하였습니다 .".format(count))
 
     is_alert.short_description = '휴면알림 완료'
+
+    def dormant_cnt(self, obj):
+        return Profile.objects.get(user=obj).dormant_cnt
+
+    def dormantNotice_day_filter(self, obj):
+        return Profile.objects.get(user=obj).dormantNotice_day_filter
+
+    dormantNotice_day_filter.boolean = True
+    dormantNotice_day_filter.short_description ='휴면전환 60일 전'
 
     def type(self, obj):
         return Profile.objects.get(user=obj).role_profile

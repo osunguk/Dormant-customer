@@ -29,6 +29,9 @@ def dormant_Alert():
                 Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
 
 
+        if dormant_Time.days <= 60: # 계정 전환 60일 전 (나중에 함수 따로 만들것)
+            Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
+
 # 휴면계정 전환
 def change_AccountGroup():
     user_list = User.objects.values()
@@ -124,9 +127,8 @@ def signup(request):
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
 
         user_list = User.objects.values()
-        for users in user_list:
-            Profile.objects.filter(user_id=users['id']).update(email=email)
-            Profile.objects.filter(user_id=users['id']).update(phoneNumber=phoneNumber)
+        Profile.objects.filter(user_id=user).update(email=email)
+        Profile.objects.filter(user_id=user).update(phoneNumber=phoneNumber)
 
         if request.POST.get('type') == 'Business':
             Profile.objects.filter(user=user).update(role_profile=1)
