@@ -22,9 +22,9 @@ class ProfileInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
-    list_display = ('username', 'email', 'last_login', 'check_alter')
+    list_display = ('username', 'email', 'last_login', 'check_alter', 'type')
     actions = ['is_alert', 'is_unalert', 'add_memo']
-    list_filter = ['groups', 'last_login',]
+    list_filter = ['groups', 'last_login', ]
     # search_fields = ('username','email','dormant_cnt','last_login',)
 
     def check_alter(self, obj):
@@ -43,6 +43,10 @@ class UserAdmin(BaseUserAdmin):
         self.message_user(request, " {} 명의 휴면알림을 완료로 변경하였습니다 .".format(count))
 
     is_alert.short_description = '휴면알림 완료'
+
+    def type(self, obj):
+        return Profile.objects.get(user=obj).role_profile
+
 
     def is_unalert(self, request, queryset):
         count = 0
@@ -76,6 +80,13 @@ class UserAdmin(BaseUserAdmin):
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
     add_memo.short_description = '사전알림 날짜 추가'
 
+
+class UserCAdmin(admin.ModelAdmin):
+    list_display = ['user_c', 'kakao_Id', 'mining_point']
+
+
+class UserBAdmin(admin.ModelAdmin):
+    list_display = ['user_b', 'company_name', 'business_number', 'star_point']
 
 
 '''
@@ -128,6 +139,6 @@ admin.site.register(Profile,ProfileAdmin)
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(UserC)
-admin.site.register(UserB)
+admin.site.register(UserC, UserCAdmin)
+admin.site.register(UserB, UserBAdmin)
 admin.site.register(DormantUserInfo)

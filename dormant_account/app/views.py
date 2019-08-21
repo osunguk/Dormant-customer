@@ -42,7 +42,6 @@ def change_AccountGroup():
 
         # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
         if (now - last_login).days >= 365:
-            """
             U = User.objects.get(username=user) # 일반계정의 데이터를 휴면계정으로 옮김
             print(U)
             dormant = DormantUserInfo() # 생성할 휴면계정
@@ -54,7 +53,6 @@ def change_AccountGroup():
             dormant.save()
             U.delete()
             # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
-            """
 
 
 sched = BackgroundScheduler()
@@ -108,11 +106,11 @@ def signup(request):
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
         if request.POST.get('type') == 'Business':
-            type = business
-            return render(request,'app/business.html',{'type':type})
+            Profile.objects.filter(user=user).update(role_profile=1)
+            return render(request,'app/business.html',{'username':user.username})
         else:
-            type = customer
-            return render(request, 'app/customer.html', {'type': type})
+            Profile.objects.filter(user=user).update(role_profile=2)
+            return render(request, 'app/customer.html',{'username':user.username})
     return render(request, 'app/signup.html')
 
 
@@ -203,15 +201,14 @@ def user_list(request):
 
 def customer(request):
     if request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(role_profile=2)
         kakao_id = request.POST['kakao_id']
-        print('working2')
+        username = request.POST.get('username')
+        user = User.objects.get(username=username)
         u = UserC()
         u.kakao_Id = kakao_id
         u.mining_point = 0
-        u.user_c = request.user
+        u.user_c = user
         u.save()
-
 
         return render(request, 'app/home.html', {'kakao_id' : kakao_id})
     return render(request, 'app/customer.html')
@@ -219,15 +216,15 @@ def customer(request):
 
 def business(request):
     if request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(role_profile=1)
         business_num = request.POST['business_num']
         company_name = request.POST['company_name']
-        print('working')
+        username = request.POST.get('username')
+        user = User.objects.get(username=username)
         u = UserB()
         u.business_number = business_num
         u.company_name = company_name
         u.star_point = 0
-        u.user_b = request.user
+        u.user_b = user
         u.save()
         return render(request, 'app/home.html', {'business_num' : business_num})
 
