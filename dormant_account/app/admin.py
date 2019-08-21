@@ -1,7 +1,8 @@
 
 from django.contrib import admin
 
-from .models import Content, Profile
+from .models import Content, Profile, DormantUserInfo, UserB, UserC
+from django.utils import timezone
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 import datetime
@@ -21,7 +22,9 @@ class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
     list_display = ('username', 'email', 'last_login', 'check_alter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
-    list_filter = ['groups', 'last_login', ]
+    list_filter = ['groups', 'last_login',]
+    filter_horizontal = ()
+    # search_fields = ('username','email','dormant_cnt','last_login',)
 
     def check_alter(self,obj):
 
@@ -29,6 +32,7 @@ class UserAdmin(BaseUserAdmin):
 
     check_alter.boolean = True
     check_alter.short_description ='휴면알림 유무'
+
     def is_alert(self, request, queryset):
         count = 0
         for z in queryset:
@@ -36,7 +40,7 @@ class UserAdmin(BaseUserAdmin):
             x = User.objects.get(username=z).id
             Profile.objects.filter(user_id= x).update(check_alert=True)
             count += 1
-        #queryset.update(check_alter = True)
+        # queryset.update(check_alter = True)
         self.message_user(request, " {} 명의 휴면알림을 완료로 변경하였습니다 .".format(count) )
     is_alert.short_description = '휴면알림 완료'
 
@@ -49,29 +53,80 @@ class UserAdmin(BaseUserAdmin):
         # queryset.update(check_alter = True)
         self.message_user(request, " {} 명의 휴면알림을 미완료로 변경하였습니다 .".format(count))
     is_unalert.short_description = '휴면알림 미완료'
-
-
     def add_memo(self, request, queryset):  #코드 리펙토링 할 것!
+
         count = 0
+
         def dormant_Alert():
             user_list = User.objects.values()
             for users in user_list:
-                u = User.objects.get(id=users['id'])
-                now = datetime.datetime.now(timezone.utc)
+
                 last_login = users['last_login']
                 if last_login is None:
                     last_login = users['date_joined']
-                return (datetime.timedelta(days=335) + last_login - now) # 계정 전환 남은기간 계산
+                return (datetime.timedelta(days=335) + last_login ) # 계정 전환 남은기간 계산
 
         for z in queryset:
-
             x = User.objects.get(username=z).id
             Profile.objects.filter(user_id=x).update(memo='사전알림 날짜 : '+ str(dormant_Alert()))
             count += 1
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
-
     add_memo.short_description = '사전알림 날짜 추가'
+
+class DormantUserInfoAdmin(admin.ModelAdmin):
+    list_display = ('username','deleteDate','checkNotice')
+
+
+'''
+class CustomAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email')
+    list_editable = ('permission',)
+    list_filter = ('permission',)
+    search_fields = ('username',)
+
+
+    list_display = ['username','id','date_joined','dormant_date']
+
+    def dormant_date(self,obj):
+        return Profile.objects.get(user=obj).dormant_cnt
+
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'check', 'dormant_cnt','check_alert')
+    list_filter = ('user', 'check_alert')
+    actions = ['Test','is_check', 'is_uncheck']
+    #search_fields = ('dormant_cnt')
+
+    def get_user(self, obj):
+        return obj.description
+    get_user.short_description = 'ID'
+
+    def Test(self, request, queryset):
+        queryset.update(dormant_cnt = 365)
+        #self.message_user((request, 'changed successfully'))
+    Test.short_description = '휴면계정 날짜 초기화'
+
+    def is_check(self, request, queryset):
+        queryset.update(check_alert = True)
+        self.message_user(request, " changed successfully ." )
+    is_check.short_description = '휴면알림 O'
+
+    def is_uncheck(self, request, queryset):
+        queryset.update(check_alert = False)
+        self.message_user(request, " changed successfully ." )
+    is_uncheck.short_description = '휴면알림 X'
+
+    def check_alert(self, check_alert):
+        return check_alert.description
+    check_alert.short_description = "휴면알림 유무"
+
+admin.site.register(Content)
+admin.site.register(Profile,ProfileAdmin)
+'''
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
+admin.site.register(UserC)
+admin.site.register(UserB)
+admin.site.register(DormantUserInfo,DormantUserInfoAdmin)
 
