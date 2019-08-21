@@ -5,10 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-    <form method="post" action="{%url 'business'  %}" >
+    <form method="post" action="{%url 'home'  %}" >
         {% csrf_token %}
         <H4>사업자 번호 : </H4>
         <input type="text" name="business_num" >
+        <H4>사업장 이름 : </H4>
+        <input type="text" name="company_name" >
+        <input type="hidden" name="type" value={{type}}>
         <input type="submit" value="확인">
     </form>
 

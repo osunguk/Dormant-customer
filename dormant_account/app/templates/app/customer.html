@@ -5,10 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-    <form method="post" action="{%url 'customer'  %}" >
+    <form method="post" action="{%url 'home'  %}" >
         {% csrf_token %}
         <H4>KaKao ID : </H4>
         <input type="text" name="kakao_id" >
+        <input type="hidden" name="type" value={{type}}>
         <input type="submit" value="확인">
     </form>
 

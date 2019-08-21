@@ -76,6 +76,7 @@ WSGI_APPLICATION = 'dormant_account.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -83,19 +84,21 @@ DATABASES = {
     }
 }
 
-'''
+"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'django_db',
-            'USER': 'jy',
-            'PASSWORD': 'jy',
+            'NAME': 'test',
+            'USER': 'osunguk',
+            'PASSWORD': '1234',
             'HOST': 'localhost',
             'PORT': '3306'
 
     }
-}
-'''
+}"""
+
+
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -133,6 +136,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
 BROKER_URL = 'django://'
-
