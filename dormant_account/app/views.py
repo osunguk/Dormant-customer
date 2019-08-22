@@ -22,12 +22,24 @@ def dormant_Alert():
             last_login = users['date_joined']
         dormant_Time = datetime.timedelta(days=365) + last_login - timezone.now()  # 계정 전환 남은기간 계산
         Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
-        if dormant_Time.days == 90:  # 휴면계정 변환 90일 전에만 하루알림
+        if dormant_Time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림
             if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
                 Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
                 if not Profile.objects.get(user=u).check_alert:
 
-                    email = EmailMessage('ZEROGO', 'ZEROGO에서 발송한 메일입니다.', to=[Profile.objects.get(user=u).email])
+                    email = EmailMessage('ZEROGO 휴면 전환 알림', """
+                    안녕하세요. 제로고입니다.
+회원님의 개인정보보호를 위해 1년 이상 사람인 서비스를 이용하지 않은 계정에 한해 정보통신망 이용 촉진 및 정보보호 등에 관한 법률에 따라 휴면 계정으로 전환될 예정입니다.
+회원님은 {} 까지 사람인 서비스 이용이 없을 경우 휴면 계정으로 전환될 예정이오니, 이를 원치 않으실 경우 로그인을 해주시기 바랍니다.
+또한, 휴면계정으로 전환되어도 아이디/비밀번호로 로그인 하면 해제할 수 있으나, 아래와 같은 서비스에 대한 변경사항이 있으니 참고 바랍니다.
+
+휴면 계정 전환 시 변경 사항
+    - 회원의 개인정보는 별도 분리하여 보관
+    - 메일 발송 중지
+
+제로고 이용약관
+① 회원이 12개월 (365일) 이상 로그인을 하지 않은 경우 해당 회원의 아이디는 휴면아이디가 되어 회원 로그 인을 비롯한 모든 서비스에 대한 이용이 정지되고, 회사는 휴면아이디의 개인정보를 다른 아이디와 별도로 관리한다.
+                    """.format(last_login + datetime.timedelta(days=365)), to=[Profile.objects.get(user=u).email])
                     email.send()
                     Profile.objects.filter(user=u).update(check_alert=True)
                     memo = Profile.objects.get(user=u).memo + '\n' + str(timezone.now()) + ' 시간부로 사전 알림 메세지 전송'

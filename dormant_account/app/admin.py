@@ -37,6 +37,8 @@ class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline, UserCInline, UserBInline,)
     list_display = ('username', 'type', '_email', 'phone_number', 'business_number', 'company_name', 'kakao_Id'
                     , 'last_login', 'check_alert' , 'dormantNotice_day_filter')
+
+
     actions = ['is_alert', 'is_unalert', 'add_memo']
     list_filter = [type_filter, dormantNotice_day_filter, check_alert, ]
     date_hierarchy = 'last_login'
@@ -53,8 +55,7 @@ class UserAdmin(BaseUserAdmin):
 
     def dormantNotice_day_filter(self, obj):
         return Profile.objects.get(user=obj).dormantNotice_day_filter
-    dormantNotice_day_filter.boolean = True
-    dormantNotice_day_filter.short_description = '휴면전환 60일 전'
+
 
     def _email(self, obj):
         return Profile.objects.get(user=obj).email
@@ -69,9 +70,6 @@ class UserAdmin(BaseUserAdmin):
     def kakao_Id(self, obj):
         return UserC.objects.get(user_c=obj).kakao_Id
 
-    check_alert.boolean = True
-    check_alert.short_description = '휴면알림 유무'
-
     def is_alert(self, request, queryset):
         count = 0
         for z in queryset:
@@ -81,7 +79,6 @@ class UserAdmin(BaseUserAdmin):
         # queryset.update(check_alter = True)
         self.message_user(request, " {} 명의 휴면알림을 완료로 변경하였습니다 .".format(count))
 
-    is_alert.short_description = '휴면알림 완료'
 
     def dormant_cnt(self, obj):
         return Profile.objects.get(user=obj).dormant_cnt
@@ -89,8 +86,6 @@ class UserAdmin(BaseUserAdmin):
     def dormantNotice_day_filter(self, obj):
         return Profile.objects.get(user=obj).dormantNotice_day_filter
 
-    dormantNotice_day_filter.boolean = True
-    dormantNotice_day_filter.short_description = '휴면전환 60일 전'
 
     def type(self, obj):
         return Profile.objects.get(user=obj).role_profile
@@ -103,7 +98,6 @@ class UserAdmin(BaseUserAdmin):
             count += 1
 
         self.message_user(request, " {} 명의 휴면알림을 미완료로 변경하였습니다 .".format(count))
-    is_unalert.short_description = '휴면알림 미완료'
 
     def add_memo(self, request, queryset):  # 코드 리펙토링 할 것!
         count = 0
@@ -125,8 +119,22 @@ class UserAdmin(BaseUserAdmin):
             Profile.objects.filter(user_id=x).update(memo='사전알림 날짜 : ' + str(dormant_Alert()))
             count += 1
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
+
+    is_unalert.short_description = '휴면알림 미완료'
+    is_alert.short_description = '휴면알림 완료'
     add_memo.short_description = '사전알림 날짜 추가'
 
+    dormantNotice_day_filter.short_description = '휴면전환 60일 전'
+    check_alert.boolean = True
+    dormantNotice_day_filter.boolean = True
+    dormantNotice_day_filter.boolean = True
+
+    type.short_description = '타입'
+    _email.short_description = '메일주소'
+    phone_number.short_description = '전화번호'
+    business_number.short_description = '사업자 번호'
+    company_name.short_description = '업체 이름'
+    check_alert.short_description = '알림 유무'
 
 class UserCAdmin(admin.ModelAdmin):
     list_display = ['user_c', 'kakao_Id', 'mining_point']
