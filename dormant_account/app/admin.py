@@ -5,7 +5,6 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, UserAdmin
 from django.contrib.auth.models import User
 from .filters import dormantNotice_day_filter, check_alert
 import datetime
-from app.filters import dormantNotice_day_filter
 
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '

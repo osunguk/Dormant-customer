@@ -7,38 +7,40 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Max
 import datetime
-
+import time
 
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 # 휴면계정 알림
 def dormant_Alert():
     user_list = User.objects.values()
     for users in user_list:
         u = User.objects.get(id=users['id'])
-        now = datetime.datetime.now(timezone.utc)
+
         last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        dormant_Time = datetime.timedelta(days=365) + last_login - now  # 계정 전환 남은기간 계산
+        dormant_Time = datetime.timedelta(days=365) + last_login - timezone.now()  # 계정 전환 남은기간 계산
         Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
-
         if dormant_Time.days <= 30 :  # 휴면계정 변환 30일 전 알림
             if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
                 Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
+                if not Profile.objects.get(user=u).check_alert:
+
+                    email = EmailMessage('ZEROGO', 'ZEROGO에서 발송한 메일입니다.', to=[Profile.objects.get(user=u).email])
+                    email.send()
+                    Profile.objects.filter(user=u).update(check_alert=True)
+                    memo = Profile.objects.get(user=u).memo + '\n' + str(timezone.now()) + ' 시간부로 사전 알림 메세지 전송'
+                    Profile.objects.filter(user=u).update(memo=memo)
         if dormant_Time.days <= 60:  # 계정 전환 60일 전 (나중에 함수 따로 만들것)
             Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
-
-
-        if dormant_Time.days <= 60: # 계정 전환 60일 전 (나중에 함수 따로 만들것)
-            Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
-
 # 휴면계정 전환
 def change_AccountGroup():
     user_list = User.objects.values()
     for users in user_list:
-        user = User.objects.get(username=users['username'])  # 유저리스트에서 username 가져옴
+        user = User.objects.get(id=users['id'])  # 유저리스트에서 username 가져옴
         last_login = users['last_login']
 
         now = datetime.datetime.now(timezone.utc)
@@ -86,7 +88,7 @@ def dormant_process():
 
 sched = BackgroundScheduler()
 sched.add_job(change_AccountGroup, 'interval', seconds=3)
-sched.add_job(dormant_Alert, 'interval', seconds=3)
+sched.add_job(dormant_Alert, 'interval', seconds=5)
 sched.add_job(dormant_process, 'interval', seconds=3)
 sched.start()
 
