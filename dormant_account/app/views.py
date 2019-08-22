@@ -24,15 +24,9 @@ def dormant_Alert():
         dormant_Time = datetime.timedelta(days=365) + last_login - now  # 계정 전환 남은기간 계산
         Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
 
-        if dormant_Time.days <= 30 :  # 휴면계정 변환 30일 전 알림
-            if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
-                Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
         if dormant_Time.days <= 60:  # 계정 전환 60일 전 (나중에 함수 따로 만들것)
             Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
 
-
-        if dormant_Time.days <= 60: # 계정 전환 60일 전 (나중에 함수 따로 만들것)
-            Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
 
 # 휴면계정 전환
 def change_AccountGroup():
@@ -52,6 +46,7 @@ def change_AccountGroup():
             dormant.id = U.id
             dormant.lastLogin = last_login
             dormant.dormantDate = last_login + datetime.timedelta(days=365)
+            dormant.memo = Profile.objects.get(user=U).memo + '\n' + str(timezone.now())+' 시간부로 휴면계정으로 전환'
             if Profile.objects.get(user=U).role_profile == 1:
                 dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=1780)
             else:
@@ -112,6 +107,7 @@ def login(request):
             u.email = d.email
             u.phoneNumber = d.phoneNumber
             u.role_profile = d.role_dormant
+            u.memo = d.memo + '\n' + str(timezone.now()) + ' 시간부로 일반계정으로 전환'
             if d.role_dormant == 1:
                 b = UserB()
                 b.user_b = User.objects.get(username=name)
