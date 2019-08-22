@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Profile, DormantUserInfo, UserB, UserC
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .filters import dormantNotice_day_filter, check_alert, type_filter
 import datetime
 
@@ -32,9 +32,16 @@ class UserBInline(admin.StackedInline):
     fk_name = 'user_b'
     extra = 0
 
+class UserBInline(admin.StackedInline):
+    model = UserB
+    can_delete = False
+    verbose_name_plural = '세부정보'
+    fk_name = 'user_b'
+    extra = 0
+
 
 class UserAdmin(BaseUserAdmin):
-    inlines = (ProfileInline, UserCInline, UserBInline,)
+    inlines = (ProfileInline, UserBInline, UserCInline)
     list_display = ('username', 'type', '_email', 'phone_number', 'business_number', 'company_name', 'kakao_Id'
                     , 'last_login', 'check_alert', 'dormantNotice_day_filter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
@@ -130,6 +137,7 @@ class DormantUserInfoAdmin(admin.ModelAdmin):
 
 
 admin.site.unregister(User)
+admin.site.unregister(Group)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserC, UserCAdmin)
 admin.site.register(UserB, UserBAdmin)

@@ -20,6 +20,7 @@ class Content(models.Model):
 
 
 class Profile(models.Model):
+    objects = None
     BUSINESS = 1
     CUSTOMER = 2
     ROLE_CHOICES = (
@@ -48,6 +49,8 @@ class UserC(models.Model):
     kakao_Id = models.CharField('카카오톡 아이디', max_length=100)
     mining_point = models.IntegerField('보유 포인트', default=0)
 
+    def __str__(self):
+        return str(self.user_c.username)
 
 class UserB(models.Model):
     class Meta:
@@ -57,6 +60,8 @@ class UserB(models.Model):
     business_number = models.IntegerField('사업자 번호',)
     star_point = models.IntegerField('보유 별', default=0)
 
+    def __str__(self):
+        return str(self.user_b.username)
 
 class DormantUserInfo(models.Model):  # 휴면계정 모델
     class Meta:

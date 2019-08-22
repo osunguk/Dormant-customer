@@ -209,6 +209,7 @@ def board(request):
                   {'contents': content_all, 'dormant_account': dormant_account, 'userdata': user,
                    'total': total_content})
 
+
 def user(request):
     user = request.user
     last_login = request.user.last_login
