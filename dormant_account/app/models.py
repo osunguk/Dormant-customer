@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.utils.timezone import now
 
 from django.db.models.signals import post_save  # 장고의 signals로 특정 이벤트가 발생했을 때 신호를 통한 여러 작업들을 도와주는 모듈
 from django.dispatch import receiver  # 위와 동문
@@ -13,8 +12,8 @@ class Content(models.Model):
     contents = models.CharField(max_length=300)
     writer = models.CharField('writer', max_length=100)
 
-    date_joined = models.DateTimeField(default=timezone.now)
-    last_edit = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(default=timezone.localtime())
+    last_edit = models.DateTimeField(default=timezone.localtime())
 
     def __str__(self):
         return self.title
@@ -71,14 +70,14 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     # 공통 속성
     username = models.CharField('username', max_length=100, blank=True)
     role_dormant = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    lastLogin = models.DateTimeField(blank=True, default=now)
+    lastLogin = models.DateTimeField(blank=True, default=timezone.localtime())
     email = models.EmailField('이메일', max_length=100, blank=True)
     phoneNumber = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     memo = models.TextField('memo', max_length=1000, blank=True)
     
     # 휴면계정 속성
-    dormantDate = models.DateTimeField(default=timezone.now)
-    deleteDate = models.DateTimeField(blank=True, default=now)
+    dormantDate = models.DateTimeField(default=timezone.localtime())
+    deleteDate = models.DateTimeField(blank=True, default=timezone.localtime())
     checkNotice = models.BooleanField(default=False)
     
     # B 속성

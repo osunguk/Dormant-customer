@@ -4,7 +4,6 @@ from django.contrib import auth
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.db.models import Max
-
 import datetime
 
 from .models import Content, Profile, DormantUserInfo, UserB, UserC
@@ -17,10 +16,11 @@ def dormant_Alert():
     for users in user_list:
         u = User.objects.get(id=users['id'])
 
-        last_login = users['last_login']
+        last_login =users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        dormant_Time = datetime.timedelta(days=365) + last_login - timezone.now()  # 계정 전환 남은기간 계산
+        dormant_Time = datetime.timedelta(days=365) + last_login - timezone.localtime()  # 계정 전환 남은기간 계산
+        dTime = datetime.timedelta(days=365) + last_login
         Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
         if dormant_Time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림 if dormant_Time.days == 90:
             if Profile.objects.get(user=u).email:
@@ -38,7 +38,7 @@ def dormant_Alert():
     """.format(last_login + datetime.timedelta(days=365)), to=[Profile.objects.get(user=u).email])
                     email.send()
                     Profile.objects.filter(user=u).update(check_alert=True)
-                    memo = Profile.objects.get(user=u).memo + '\n' + str(timezone.now()) + ' 시간부로 사전 알림 메세지 전송'
+                    memo = Profile.objects.get(user=u).memo + '\n' + str(timezone.localtime()) + ' 시간부로 사전 알림 메세지 전송'
                     Profile.objects.filter(user=u).update(memo=memo)
                 else:
                     pass
@@ -53,7 +53,7 @@ def change_AccountGroup():
         user = User.objects.get(id=users['id'])  # 유저리스트에서 username 가져옴
         last_login = users['last_login']
 
-        now = datetime.datetime.now(timezone.utc)
+        now = timezone.localtime()
         if last_login is None:
             last_login = users['date_joined']
 
@@ -64,7 +64,7 @@ def change_AccountGroup():
             dormant.id = U.id
             dormant.lastLogin = last_login
             dormant.dormantDate = last_login + datetime.timedelta(days=365)
-            dormant.memo = Profile.objects.get(user=U).memo + '\n' + str(timezone.now())+' 시간부로 휴면계정으로 전환'
+            dormant.memo = Profile.objects.get(user=U).memo + '\n' + str(timezone.localtime())+' 시간부로 휴면계정으로 전환'
             if Profile.objects.get(user=U).role_profile == 1:
                 dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=1780)
             else:
@@ -88,11 +88,10 @@ def change_AccountGroup():
             U.delete()
             # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
 
-
 def dormant_process():
     user_list = DormantUserInfo.objects.values()
     for user in user_list:
-        if user['deleteDate'] - timezone.now() < datetime.timedelta(days=0):
+        if user['deleteDate'] - timezone.localtime() < datetime.timedelta(days=0):
             d = DormantUserInfo.objects.get(username=user['username'])
             print(d.username+' : 삭제')
             # d.delete()
@@ -121,12 +120,12 @@ def login(request):
 
         if check_DormantAccount: # 휴면계정 삭제 & 일반 계정 생성
             d = DormantUserInfo.objects.get(username=name)
-            User.objects.create_user(username=d.username, password=pwd, last_login=timezone.now())
+            User.objects.create_user(username=d.username, password=pwd, last_login=timezone.localtime())
             u = Profile.objects.get(user=User.objects.get(username=name))
             u.email = d.email
             u.phoneNumber = d.phoneNumber
             u.role_profile = d.role_dormant
-            u.memo = d.memo + '\n' + str(timezone.now()) + ' 시간부로 일반계정으로 전환'
+            u.memo = d.memo + '\n' + str(timezone.localtime()) + ' 시간부로 일반계정으로 전환'
             if d.role_dormant == 1:
                 b = UserB()
                 b.user_b = User.objects.get(username=name)
@@ -149,7 +148,7 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             Profile.objects.filter(user_id=user.id).update(check='')
-            User.objects.filter(username=name).update(last_login=timezone.now())  # 마지막 로그인 시간 최신화
+            User.objects.filter(username=name).update(last_login=timezone.localtime())  # 마지막 로그인 시간 최신화
             return render(request, 'app/board.html',
                           {'contents': content_all,
                            'total': total_content,'check_DormantAccount':check_DormantAccount})
@@ -173,7 +172,7 @@ def signup(request):
         if check_id:  # id가 중복일때 signup 거부
             pass
         userpwd = request.POST['pwd']
-        user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.now())
+        user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.localtime())
         Profile.objects.filter(user_id=user).update(email=email)
         Profile.objects.filter(user_id=user).update(phoneNumber=phoneNumber)
         if request.POST.get('type') == 'Business':
@@ -210,12 +209,11 @@ def board(request):
                   {'contents': content_all, 'dormant_account': dormant_account, 'userdata': user,
                    'total': total_content})
 
-
 def user(request):
     user = request.user
     last_login = request.user.last_login
     joined_data = request.user.date_joined
-    now = datetime.datetime.now(timezone.utc)
+    now = timezone.localtime()
     day = (now - last_login).days
     result = (now - last_login)
     return render(request, 'app/user.html',{'name': user, 'last_login': last_login, 'joined_data': joined_data, 'now': now, 'result': result,'day': day})
@@ -241,7 +239,7 @@ def edit(request, number):
     if request.method == 'POST':  # 수정된 내용을 입력한후 detail로 이동
         content.title = request.POST['title']
         content.contents = request.POST['content']
-        content.last_edit = datetime.datetime.now(timezone.utc)
+        content.last_edit = timezone.localtime()
         content.save()
         return render(request, 'app/detail.html', {'content': content})
     else:  # 수정 페이지로 이동

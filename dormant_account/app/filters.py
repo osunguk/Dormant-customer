@@ -47,7 +47,7 @@ class type_filter(admin.SimpleListFilter):
 
 class check_alert(admin.SimpleListFilter):
     title = '휴면알림 유무'
-    parameter_name = 'd'
+    parameter_name = 'check_alert'
 
     def lookups(self, request, model_admin):
         return (
