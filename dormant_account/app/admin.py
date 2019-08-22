@@ -96,7 +96,7 @@ class UserAdmin(BaseUserAdmin):
                 return (datetime.timedelta(days=275) + last_login ) # 계정 전환 남은기간 계산
         for z in queryset:
             x = User.objects.get(username=z).id
-            Profile.objects.filter(user_id=x).update(memo='사전알림 날짜 : ' + str(dormant_Alert()))
+            Profile.objects.filter(user_id=x).update(memo=Profile.objects.get(user_id=x).memo+'\n 사전알림 날짜 : ' + str(dormant_Alert()))
             count += 1
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
 
