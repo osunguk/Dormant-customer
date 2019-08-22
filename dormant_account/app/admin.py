@@ -121,7 +121,7 @@ class UserAdmin(BaseUserAdmin):
                 if last_login is None:
                     last_login = users['date_joined']
 
-                return (datetime.timedelta(days=335) + last_login ) # 계정 전환 남은기간 계산
+                return (datetime.timedelta(days=275) + last_login ) # 계정 전환 남은기간 계산
 
         for z in queryset:
             x = User.objects.get(username=z).id

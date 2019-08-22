@@ -24,7 +24,7 @@ def dormant_Alert():
             last_login = users['date_joined']
         dormant_Time = datetime.timedelta(days=365) + last_login - timezone.now()  # 계정 전환 남은기간 계산
         Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
-        if dormant_Time.days <= 30 :  # 휴면계정 변환 30일 전 알림
+        if dormant_Time.days == 90:  # 휴면계정 변환 30일 전 알림
             if not u.groups.filter(name='dormant_account').exists():  # 휴면계정은 제외
                 Profile.objects.filter(user_id=users['id']).update(check=str(dormant_Time.days)+'일 뒤 휴면계정으로 전환 예정')
                 if not Profile.objects.get(user=u).check_alert:
