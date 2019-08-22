@@ -33,7 +33,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
     check = models.CharField('check', max_length=100, blank=True)
     dormant_cnt = models.IntegerField('dormant_cnt', default=0)
-    memo = models.TextField('memo', max_length=300, blank=True)
+    memo = models.TextField('memo', max_length=1000, blank=True)
     check_alert = models.BooleanField('check_alter', default=False, blank=True)
     role_profile = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
     dormantNotice_day_filter = models.BooleanField('dormantNotice_day_filter', default=False, blank=True)
@@ -74,6 +74,7 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     lastLogin = models.DateTimeField(blank=True, default=now)
     email = models.EmailField('이메일', max_length=100, blank=True)
     phoneNumber = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
+    memo = models.TextField('memo', max_length=1000, blank=True)
     
     # 휴면계정 속성
     dormantDate = models.DateTimeField(default=timezone.now)
