@@ -35,7 +35,7 @@ class UserBInline(admin.StackedInline):
 
 
 class UserAdmin(BaseUserAdmin):
-
+    readonly_fields = ('dormant_cnt',)
     inlines = (ProfileInline, UserCInline, UserBInline,)
     list_display = ('username', 'type', '_email', 'phone_number', 'business_number', 'company_name', 'kakao_Id'
                     , 'last_login', 'check_alert' , 'dormantNotice_day_filter')
@@ -48,7 +48,7 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {'fields': ('username',)}),
-        (('시간 DATA'), {'fields': ('last_login', 'date_joined')}),
+        (('시간 DATA'), {'fields': ('last_login', 'date_joined', 'dormant_cnt')}),
     )
 
     def dormant_cnt(self, obj):
