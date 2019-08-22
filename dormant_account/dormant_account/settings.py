@@ -136,3 +136,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 BROKER_URL = 'django://'
+
+
+#ADMINS = [('eric', 'wnsdud3119@gmail.com'), ('Mary', 'mary@example.com')]
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = 'wnsdud3119@gmail.com'
+EMAIL_HOST_PASSWORD = 'zerogo1!'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
