@@ -3,13 +3,13 @@ from django.utils import timezone
 from .models import Content, Profile, DormantUserInfo, UserB, UserC
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, UserAdmin
 from django.contrib.auth.models import User
-from .filters import dormantNotice_day_filter, check_alert
+from .filters import dormantNotice_day_filter, check_alert, type_filter
 import datetime
-from app.filters import dormantNotice_day_filter
 
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
 admin.site.index_title = 'ZEROGO User'
+
 
 class ProfileInline(admin.StackedInline):
     model = Profile
@@ -40,7 +40,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'type', '_email', 'phone_number', 'business_number', 'company_name', 'kakao_Id'
                     , 'last_login', 'check_alert' , 'dormantNotice_day_filter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
-    list_filter = ['groups', 'last_login', dormantNotice_day_filter, check_alert ]
+    list_filter = [type_filter, dormantNotice_day_filter, check_alert, ]
     search_fields = ['username', 'profile__email', 'profile__phoneNumber',
                      'userc__kakao_Id', 'userb__company_name', 'userb__business_number']
 
