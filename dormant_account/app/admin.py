@@ -25,6 +25,7 @@ class UserCInline(admin.StackedInline):
     extra = 0
     max_num = 1
 
+
 class UserBInline(admin.StackedInline):
     model = UserB
     can_delete = False
@@ -35,13 +36,13 @@ class UserBInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline, UserBInline, UserCInline)
-    list_display = ('username', 'type', '_email', 'phone_number', 'business_number', 'company_name', 'kakao_Id'
+    list_display = ('username', 'type', '_email', 'phone_number', 'company_cnt', 'kakao_Id'
                     , 'last_login', 'check_alert', 'dormantNotice_day_filter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
     list_filter = [type_filter, dormantNotice_day_filter, check_alert, ]
     date_hierarchy = 'last_login'
     search_fields = ['username', 'profile__email', 'profile__phoneNumber',
-                     'userc__kakao_Id', 'userb__company_name', 'userb__business_number']
+                     'userc__kakao_Id', 'userb__company_name', 'userb__business_number',]
     readonly_fields = ('dormant_cnt',)
     fieldsets = (
         (None, {'fields': ('username',)}),
@@ -59,10 +60,8 @@ class UserAdmin(BaseUserAdmin):
         return Profile.objects.get(user=obj).phoneNumber
     def check_alert(self, obj):
         return Profile.objects.get(user=obj).check_alert
-    def business_number(self, obj):
-        return UserB.objects.get(user_b=obj).business_number
-    def company_name(self, obj):
-        return UserB.objects.get(user_b=obj).company_name
+    def company_cnt(self, obj):
+        return len(UserB.objects.filter(user_b=obj))
     def kakao_Id(self, obj):
         return UserC.objects.get(user_c=obj).kakao_Id
     def type(self, obj):
@@ -113,9 +112,8 @@ class UserAdmin(BaseUserAdmin):
     type.short_description = '타입'
     _email.short_description = '메일주소'
     phone_number.short_description = '전화번호'
-    business_number.short_description = '사업자 번호'
-    company_name.short_description = '업체 이름'
     check_alert.short_description = '알림 유무'
+    company_cnt.short_description = '사업장 갯수'
 
 
 class UserCAdmin(admin.ModelAdmin):
