@@ -8,7 +8,7 @@ from .models import (
     Profile, DormantUserInfo, UserB, UserC
 )
 from .filters import (
-    dormantNotice_day_filter, check_alert, type_filter
+    TypeFilter, CheckAlert, AccountConversionAlertFilter
 )
 
 
@@ -46,7 +46,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'type', '_email', 'phone_number', 'company_cnt', 'kakao_Id'
                     , 'last_login', 'check_alert', 'dormantNotice_day_filter')
     actions = ['is_alert', 'is_unalert', 'add_memo']
-    list_filter = [type_filter, dormantNotice_day_filter, check_alert, ]
+    list_filter = [AccountConversionAlertFilter, TypeFilter, CheckAlert]
     date_hierarchy = 'last_login'
     search_fields = ['username', 'profile__email', 'profile__phoneNumber',
                      'userc__kakao_Id', 'userb__company_name', 'userb__business_number',]
@@ -93,6 +93,7 @@ class UserAdmin(BaseUserAdmin):
 
     def add_memo(self, request, queryset):  # 코드 리펙토링 할 것!
         count = 0
+
         def dormant_Alert():
             user_list = User.objects.values()
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 
-class dormantNotice_day_filter(admin.SimpleListFilter):
+class AccountConversionAlertFilter(admin.SimpleListFilter):
     title = '휴면알림 60일 전'
     parameter_name = 'day_filter'
 
@@ -14,15 +14,13 @@ class dormantNotice_day_filter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == 'Yes':
-            return  queryset.filter(profile__dormantNotice_day_filter=True)
-
+            return queryset.filter(profile__dormantNotice_day_filter=True)
         elif value == 'No':
             return queryset.filter(profile__dormantNotice_day_filter=False)
-
         return queryset.all()
 
 
-class type_filter(admin.SimpleListFilter):
+class TypeFilter(admin.SimpleListFilter):
     title = '고객 type'
     parameter_name = 'type_filter'
 
@@ -44,7 +42,7 @@ class type_filter(admin.SimpleListFilter):
         return queryset.all()
 
 
-class check_alert(admin.SimpleListFilter):
+class CheckAlert(admin.SimpleListFilter):
     title = '휴면알림 유무'
     parameter_name = 'check_alert'
 
@@ -57,9 +55,7 @@ class check_alert(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == 'Yes':
-            return  queryset.filter(profile__check_alert= True)
-
+            return queryset.filter(profile__check_alert=True)
         elif value == 'No':
             return queryset.filter(profile__check_alert=False)
-
         return queryset.all()
