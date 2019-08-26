@@ -16,18 +16,17 @@ from .models import (
 )
 
 
-def dormant_Alert(): # 휴면계정 알림
+def dormant_alert(): # 휴면계정 알림
     user_list = User.objects.values()
     for users in user_list:
         u = User.objects.get(id=users['id'])
 
-        last_login =users['last_login']
+        last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
-        dormant_Time = datetime.timedelta(days=365) + last_login - timezone.localtime()  # 계정 전환 남은기간 계산
-        dTime = datetime.timedelta(days=365) + last_login
-        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_Time.days)
-        if dormant_Time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림 if dormant_Time.days == 90:
+        dormant_time = datetime.timedelta(days=365) + last_login - timezone.localtime()  # 계정 전환 남은기간 계산
+        Profile.objects.filter(user_id=users['id']).update(dormant_cnt=dormant_time.days)
+        if dormant_time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림 if dormant_Time.days == 90:
             if Profile.objects.get(user=u).email:
                 if not Profile.objects.get(user=u).check_alert:
                     email = EmailMessage('ZEROGO 휴면 전환 알림',
@@ -48,11 +47,11 @@ def dormant_Alert(): # 휴면계정 알림
                     Profile.objects.filter(user=u).update(memo=memo)
                 else:
                     pass
-        if dormant_Time.days <= 60:  # 계정 전환 60일 전 필터 값 update
+        if dormant_time.days <= 60:  # 계정 전환 60일 전 필터 값 update
             Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
 
 
-def change_AccountGroup(): # 휴면계정 전환
+def change_account_group():  # 휴면계정 전환
     user_list = User.objects.values()
     for users in user_list:
         user = User.objects.get(id=users['id'])  # 유저리스트에서 username 가져옴
@@ -104,8 +103,8 @@ def dormant_process():
 
 
 sched = BackgroundScheduler()
-sched.add_job(change_AccountGroup, 'interval', seconds=3)
-sched.add_job(dormant_Alert, 'interval', seconds=5)
+sched.add_job(change_account_group, 'interval', seconds=3)
+sched.add_job(dormant_alert, 'interval', seconds=5)
 sched.add_job(dormant_process, 'interval', seconds=3)
 sched.start()
 
