@@ -70,7 +70,7 @@ def change_account_group():  # 휴면계정 전환
                 memo=Profile.objects.get(user=U).memo + '\n' + str(timezone.localtime()) + ' 시간부로 휴면계정으로 전환',
                 username=U.username,
                 email=Profile.objects.get(user=U).email,
-                phoneNumber=Profile.objects.get(user=U).phoneNumber,
+                phone_number=Profile.objects.get(user=U).phone_number,
                 role_dormant=Profile.objects.get(user=U).role_profile
             )
             if Profile.objects.get(user=U).role_profile == 1:
@@ -93,7 +93,7 @@ def change_account_group():  # 휴면계정 전환
 def dormant_process():
     _user_list = DormantUserInfo.objects.values()
     for _user in _user_list:
-        if user['delete_date'] - timezone.localtime() < datetime.timedelta(days=0):
+        if _user['delete_date'] - timezone.localtime() < datetime.timedelta(days=0):
             d = DormantUserInfo.objects.get(username=_user['username'])
             print(d.username + ' : 삭제')
             # d.delete()
@@ -121,12 +121,12 @@ def login(request):
         if check_dormant_account:  # 휴면계정 삭제 & 일반 계정 생성
             d = DormantUserInfo.objects.get(username=name)
             User.objects.create_user(username=d.username, password=pwd, last_login=timezone.localtime())
-            Profile.objects.get(user=User.objects.get(username=name)).update(
+            Profile.objects.filter(user=User.objects.get(username=name)).update(
                 email=d.email,
-                phoneNumber=d.phoneNumber,
+                phone_number=d.phone_number,
                 role_profile=d.role_dormant,
                 memo=d.memo + '\n' + str(timezone.localtime()) + ' 시간부로 일반계정으로 전환'
-            ).save()
+            )
             if d.role_dormant == 1:
                 UserB(
                     user_b=User.objects.get(username=name),
