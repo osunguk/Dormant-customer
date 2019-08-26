@@ -1,9 +1,8 @@
-from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import User
-
-from django.db.models.signals import post_save  # 장고의 signals로 특정 이벤트가 발생했을 때 신호를 통한 여러 작업들을 도와주는 모듈
-from django.dispatch import receiver  # 위와 동문
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 
 class Content(models.Model):
@@ -52,6 +51,7 @@ class UserC(models.Model):
     def __str__(self):
         return str(self.user_c.username)
 
+
 class UserB(models.Model):
     class Meta:
         verbose_name_plural = "비즈니스 사용자"
@@ -62,6 +62,7 @@ class UserB(models.Model):
 
     def __str__(self):
         return str(self.user_b.username)
+
 
 class DormantUserInfo(models.Model):  # 휴면계정 모델
     class Meta:

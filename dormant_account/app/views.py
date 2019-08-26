@@ -1,17 +1,22 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
-from django.contrib import auth
-from django.utils import timezone
-from django.core.mail import EmailMessage
-from django.db.models import Max
 import datetime
 
-from .models import Content, Profile, DormantUserInfo, UserB, UserC
 from apscheduler.schedulers.background import BackgroundScheduler
+from django.contrib.auth.models import User
+from django.contrib import auth
+from django.core.mail import EmailMessage
+from django.db.models import Max
+from django.shortcuts import (
+    render, redirect, get_object_or_404,
+)
+from django.utils import timezone
+
+from .models import (
+    Content, Profile, DormantUserInfo,
+    UserB, UserC,
+)
 
 
-# 휴면계정 알림
-def dormant_Alert():
+def dormant_Alert(): # 휴면계정 알림
     user_list = User.objects.values()
     for users in user_list:
         u = User.objects.get(id=users['id'])
@@ -47,8 +52,7 @@ def dormant_Alert():
             Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
 
 
-# 휴면계정 전환
-def change_AccountGroup():
+def change_AccountGroup(): # 휴면계정 전환
     user_list = User.objects.values()
     for users in user_list:
         user = User.objects.get(id=users['id'])  # 유저리스트에서 username 가져옴
@@ -88,6 +92,7 @@ def change_AccountGroup():
             dormant.save()
             U.delete()
             # print('ID : ' + users['username'] + '은(는) 휴면계정으로 전환되었습니다.')
+
 
 def dormant_process():
     user_list = DormantUserInfo.objects.values()

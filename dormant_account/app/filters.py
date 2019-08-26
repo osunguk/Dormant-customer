@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 
 
 class dormantNotice_day_filter(admin.SimpleListFilter):

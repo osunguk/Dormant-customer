@@ -1,9 +1,16 @@
+import datetime
+
 from django.contrib import admin
-from .models import Profile, DormantUserInfo, UserB, UserC
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User, Group
-from .filters import dormantNotice_day_filter, check_alert, type_filter
-import datetime
+
+from .models import (
+    Profile, DormantUserInfo, UserB, UserC
+)
+from .filters import (
+    dormantNotice_day_filter, check_alert, type_filter
+)
+
 
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
