@@ -14,9 +14,9 @@ class AccountConversionAlertFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == 'Yes':
-            return queryset.filter(profile__dormantNotice_day_filter=True)
+            return queryset.filter(profile__conversion_check=True)
         elif value == 'No':
-            return queryset.filter(profile__dormantNotice_day_filter=False)
+            return queryset.filter(profile__conversion_check=False)
         return queryset.all()
 
 

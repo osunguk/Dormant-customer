@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'dormant_account.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'mydb'
+            'NAME': 'test'
     }
 }
 

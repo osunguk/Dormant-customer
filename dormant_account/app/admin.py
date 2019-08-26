@@ -43,13 +43,13 @@ class UserBInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline, UserBInline, UserCInline)
-    list_display = ('username', 'type', '_email', 'phone_number', 'company_cnt', 'kakao_Id'
-                    , 'last_login', 'check_alert', 'dormantNotice_day_filter')
+    list_display = ('username', 'type', '_email', 'phone_number', 'company_cnt', 'kakao_id'
+                    , 'last_login', 'check_alert', 'conversion_check')
     actions = ['is_alert', 'is_unalert', 'add_memo']
     list_filter = [AccountConversionAlertFilter, TypeFilter, CheckAlert]
     date_hierarchy = 'last_login'
-    search_fields = ['username', 'profile__email', 'profile__phoneNumber',
-                     'userc__kakao_Id', 'userb__company_name', 'userb__business_number',]
+    search_fields = ['username', 'profile__email', 'profile__phone_number',
+                     'userc__kakao_id', 'userb__company_name', 'userb__business_number',]
     readonly_fields = ('dormant_cnt',)
     fieldsets = (
         (None, {'fields': ('username',)}),
@@ -59,18 +59,18 @@ class UserAdmin(BaseUserAdmin):
 
     def dormant_cnt(self, obj):
         return Profile.objects.get(user=obj).dormant_cnt
-    def dormantNotice_day_filter(self, obj):
-        return Profile.objects.get(user=obj).dormantNotice_day_filter
+    def conversion_check(self, obj):
+        return Profile.objects.get(user=obj).conversion_check
     def _email(self, obj):
         return Profile.objects.get(user=obj).email
     def phone_number(self, obj):
-        return Profile.objects.get(user=obj).phoneNumber
+        return Profile.objects.get(user=obj).phone_number
     def check_alert(self, obj):
         return Profile.objects.get(user=obj).check_alert
     def company_cnt(self, obj):
         return len(UserB.objects.filter(user_b=obj))
-    def kakao_Id(self, obj):
-        return UserC.objects.get(user_c=obj).kakao_Id
+    def kakao_id(self, obj):
+        return UserC.objects.get(user_c=obj).kakao_id
     def type(self, obj):
         return Profile.objects.get(user=obj).role_profile
 
@@ -112,10 +112,9 @@ class UserAdmin(BaseUserAdmin):
     is_alert.short_description = '휴면알림 완료'
     add_memo.short_description = '사전알림 날짜 추가'
 
-    dormantNotice_day_filter.short_description = '휴면전환 60일 전'
+    conversion_check.short_description = '휴면전환 60일 전'
     check_alert.boolean = True
-    dormantNotice_day_filter.boolean = True
-    dormantNotice_day_filter.boolean = True
+    conversion_check.boolean = True
 
     type.short_description = '타입'
     _email.short_description = '메일주소'
@@ -125,7 +124,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class UserCAdmin(admin.ModelAdmin):
-    list_display = ['user_c', 'kakao_Id', 'mining_point']
+    list_display = ['user_c', 'kakao_id', 'mining_point']
 
 
 class UserBAdmin(admin.ModelAdmin):
@@ -133,7 +132,7 @@ class UserBAdmin(admin.ModelAdmin):
 
 
 class DormantUserInfoAdmin(admin.ModelAdmin):
-    list_display = ['username','lastLogin','dormantDate','deleteDate']
+    list_display = ['username','last_login','dormant_date','delete_date']
 
 
 admin.site.unregister(User)

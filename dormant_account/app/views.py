@@ -48,7 +48,7 @@ def dormant_alert(): # 휴면계정 알림
                 else:
                     pass
         if dormant_time.days <= 60:  # 계정 전환 60일 전 필터 값 update
-            Profile.objects.filter(user_id=users['id']).update(dormantNotice_day_filter=True)
+            Profile.objects.filter(user_id=users['id']).update(conversion_check=True)
 
 
 def change_account_group():  # 휴면계정 전환
@@ -66,13 +66,13 @@ def change_account_group():  # 휴면계정 전환
             U = User.objects.get(username=user)  # 일반계정의 데이터를 휴면계정으로 옮김
             dormant = DormantUserInfo()  # 생성할 휴면계정
             dormant.id = U.id
-            dormant.lastLogin = last_login
-            dormant.dormantDate = last_login + datetime.timedelta(days=365)
+            dormant.last_login = last_login
+            dormant.dormant_date = last_login + datetime.timedelta(days=365)
             dormant.memo = Profile.objects.get(user=U).memo + '\n' + str(timezone.localtime())+' 시간부로 휴면계정으로 전환'
             if Profile.objects.get(user=U).role_profile == 1:
-                dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=1780)
+                dormant.delete_date = dormant.dormant_date + datetime.timedelta(days=1780)
             else:
-                dormant.deleteDate = dormant.dormantDate + datetime.timedelta(days=365)
+                dormant.delete_date = dormant.dormant_date + datetime.timedelta(days=365)
             dormant.username = U.username
             dormant.email = Profile.objects.get(user=U).email
             dormant.phoneNumber = Profile.objects.get(user=U).phoneNumber
@@ -84,7 +84,7 @@ def change_account_group():  # 휴면계정 전환
                  dormant.star_point = ub.star_point
             elif dormant.role_dormant == 2:  # 커스텀
                 uc = UserC.objects.get(user_c=U)
-                dormant.kakao_Id = uc.kakao_Id
+                dormant.kakao_id = uc.kakao_id
                 dormant.mining_point = uc.mining_point
             else:
                 pass
@@ -96,7 +96,7 @@ def change_account_group():  # 휴면계정 전환
 def dormant_process():
     user_list = DormantUserInfo.objects.values()
     for user in user_list:
-        if user['deleteDate'] - timezone.localtime() < datetime.timedelta(days=0):
+        if user['delete_date'] - timezone.localtime() < datetime.timedelta(days=0):
             d = DormantUserInfo.objects.get(username=user['username'])
             print(d.username+' : 삭제')
             # d.delete()
@@ -141,7 +141,7 @@ def login(request):
             elif d.role_dormant == 2:
                 c = UserC()
                 c.user_c = User.objects.get(username=name)
-                c.kakao_Id = d.kakao_Id
+                c.kakao_id = d.kakao_id
                 c.mining_point = d.mining_point
                 c.save()
             else:
@@ -152,7 +152,6 @@ def login(request):
 
         if user is not None:
             auth.login(request, user)
-            Profile.objects.filter(user_id=user.id).update(check='')
             User.objects.filter(username=name).update(last_login=timezone.localtime())  # 마지막 로그인 시간 최신화
             return render(request, 'app/board.html',
                           {'contents': content_all, 'total': total_content,
@@ -172,14 +171,14 @@ def signup(request):
     if request.method == 'POST':
         username = request.POST['name']
         email = request.POST['email']
-        phoneNumber = request.POST['phoneNumber']
+        phone_number = request.POST['phone_number']
         check_id = User.objects.filter(username=username).exists()
         if check_id:  # id가 중복일때 signup 거부
             pass
         userpwd = request.POST['pwd']
         user = User.objects.create_user(username=username, password=userpwd, last_login=timezone.localtime())
         Profile.objects.filter(user_id=user).update(email=email)
-        Profile.objects.filter(user_id=user).update(phoneNumber=phoneNumber)
+        Profile.objects.filter(user_id=user).update(phone_number=phone_number)
         if request.POST.get('type') == 'Business':
             Profile.objects.filter(user=user).update(role_profile=1)
             return render(request,'app/business.html',{'username':user.username})
@@ -276,7 +275,7 @@ def customer(request):
         username = request.POST.get('username')
         user = User.objects.get(username=username)
         u = UserC()
-        u.kakao_Id = kakao_id
+        u.kakao_id = kakao_id
         u.mining_point = 0
         u.user_c = user
         u.save()
