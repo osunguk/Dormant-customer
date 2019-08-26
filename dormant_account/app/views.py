@@ -29,7 +29,7 @@ def dormant_alert(): # 휴면계정 알림
         if dormant_time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림 if dormant_Time.days == 90:
             if Profile.objects.get(user=u).email:
                 if not Profile.objects.get(user=u).check_alert:
-                    email = EmailMessage('ZEROGO 휴면 전환 알림',
+                    email_message = EmailMessage('ZEROGO 휴면 전환 알림',
                                          """
     안녕하세요. 제로고입니다.
     
@@ -41,7 +41,7 @@ def dormant_alert(): # 휴면계정 알림
     - 회원의 개인정보는 별도 분리하여 보관
     - 메일 발송 중지
     """.format(last_login + datetime.timedelta(days=365)), to=[Profile.objects.get(user=u).email])
-                    email.send()
+                    email_message.send()
                     Profile.objects.filter(user=u).update(check_alert=True)
                     memo = Profile.objects.get(user=u).memo + '\n' + str(timezone.localtime()) + ' 시간부로 사전 알림 메세지 전송'
                     Profile.objects.filter(user=u).update(memo=memo)
@@ -121,9 +121,9 @@ def login(request):
 
         content_all = Content.objects.all()
         total_content = len(content_all)  # 총 게시물 수
-        check_DormantAccount = DormantUserInfo.objects.filter(username=name).exists() # 휴면계정 확인
+        check_dormant_account = DormantUserInfo.objects.filter(username=name).exists() # 휴면계정 확인
 
-        if check_DormantAccount: # 휴면계정 삭제 & 일반 계정 생성
+        if check_dormant_account: # 휴면계정 삭제 & 일반 계정 생성
             d = DormantUserInfo.objects.get(username=name)
             User.objects.create_user(username=d.username, password=pwd, last_login=timezone.localtime())
             u = Profile.objects.get(user=User.objects.get(username=name))
@@ -155,8 +155,8 @@ def login(request):
             Profile.objects.filter(user_id=user.id).update(check='')
             User.objects.filter(username=name).update(last_login=timezone.localtime())  # 마지막 로그인 시간 최신화
             return render(request, 'app/board.html',
-                          {'contents': content_all,
-                           'total': total_content,'check_DormantAccount':check_DormantAccount})
+                          {'contents': content_all, 'total': total_content,
+                           'check_dormant_account': check_dormant_account})
         else:
             return render(request, 'app/login.html', {'error': '잘못된 id 또는 pwd 입니다'})
     else:
@@ -222,7 +222,9 @@ def user(request):
     now = timezone.localtime()
     day = (now - last_login).days
     result = (now - last_login)
-    return render(request, 'app/user.html',{'name': user, 'last_login': last_login, 'joined_data': joined_data, 'now': now, 'result': result,'day': day})
+    return render(request, 'app/user.html', {'name': user, 'last_login': last_login,
+                                            'joined_data': joined_data, 'now': now,
+                                            'result': result, 'day': day})
 
 
 def detail(request, number):  # 해당 number의 게시물을 불러와 html로 전송
