@@ -28,15 +28,15 @@ class Profile(models.Model):
         (CUSTOMER, 'Customer')
     )
     # 기본 정보
+    role_profile = models.PositiveSmallIntegerField('사용자 유형', choices=ROLE_CHOICES, null=True, blank=True)
     email = models.EmailField('이메일', max_length=100, blank=True)
     phoneNumber = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성
-    check = models.CharField('check', max_length=100, blank=True)
-    dormant_cnt = models.IntegerField('dormant_cnt', default=0)
-    memo = models.TextField('memo', max_length=1000, blank=True)
-    check_alert = models.BooleanField('check_alter', default=False, blank=True)
-    role_profile = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    dormantNotice_day_filter = models.BooleanField('dormantNotice_day_filter', default=False, blank=True)
+    dormant_cnt = models.IntegerField('휴면전환 남은 일자', default=0)
+    memo = models.TextField('Memo', max_length=1000, blank=True)
+    check_alert = models.BooleanField('사전알림 여부', default=False, blank=True)
+    dormantNotice_day_filter = models.BooleanField('휴면전환 60전', default=False, blank=True)
+    check = models.CharField('비고란', max_length=100, blank=True)
 
     def __str__(self):
         return str(self.user.username)

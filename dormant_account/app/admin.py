@@ -23,14 +23,7 @@ class UserCInline(admin.StackedInline):
     verbose_name_plural = '세부정보'
     fk_name = 'user_c'
     extra = 0
-
-
-class UserBInline(admin.StackedInline):
-    model = UserB
-    can_delete = False
-    verbose_name_plural = '세부정보'
-    fk_name = 'user_b'
-    extra = 0
+    max_num = 1
 
 class UserBInline(admin.StackedInline):
     model = UserB
@@ -52,8 +45,9 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ('dormant_cnt',)
     fieldsets = (
         (None, {'fields': ('username',)}),
-        ('시간 정보', {'fields': ('last_login', 'date_joined', 'dormant_cnt')}),
+        ('시간 정보', {'fields': ('last_login', 'date_joined', )}),
     )
+
 
     def dormant_cnt(self, obj):
         return Profile.objects.get(user=obj).dormant_cnt
