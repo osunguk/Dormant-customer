@@ -19,7 +19,6 @@ class Content(models.Model):
 
 
 class Profile(models.Model):
-    objects = None
     BUSINESS = 1
     CUSTOMER = 2
     ROLE_CHOICES = (
