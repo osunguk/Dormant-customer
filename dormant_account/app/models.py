@@ -91,11 +91,11 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     # B 속성
     company_name = models.CharField('사업장 이름', max_length=100, blank=True, null=True)
     business_number = models.IntegerField('사업자 번호', blank=True, null=True)
-    star_point = models.IntegerField('보유 별', blank=True, null=True)
+    star_point = models.IntegerField('보유 별', default=0)
     
     # C 속성
     kakao_id = models.CharField('카카오톡 아이디', max_length=100, blank=True, null=True)
-    mining_point = models.IntegerField('보유 포인트', blank=True, null=True)
+    mining_point = models.IntegerField('보유 포인트', default=0)
 
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드

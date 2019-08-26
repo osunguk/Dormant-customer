@@ -43,34 +43,40 @@ class UserBInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline, UserBInline, UserCInline)
-    list_display = ('username', 'type', '_email', 'phone_number', 'company_cnt', 'kakao_id'
-                    , 'last_login', 'check_alert', 'conversion_check')
+    list_display = ('username', 'type', '_email', 'phone_number', 'company_cnt', 'kakao_id',
+                    'last_login', 'check_alert', 'conversion_check')
     actions = ['is_alert', 'is_unalert', 'add_memo']
     list_filter = [AccountConversionAlertFilter, TypeFilter, CheckAlert]
     date_hierarchy = 'last_login'
     search_fields = ['username', 'profile__email', 'profile__phone_number',
-                     'userc__kakao_id', 'userb__company_name', 'userb__business_number',]
+                     'userc__kakao_id', 'userb__company_name', 'userb__business_number', ]
     readonly_fields = ('dormant_cnt',)
     fieldsets = (
         (None, {'fields': ('username',)}),
         ('시간 정보', {'fields': ('last_login', 'date_joined', )}),
     )
 
-
     def dormant_cnt(self, obj):
         return Profile.objects.get(user=obj).dormant_cnt
+
     def conversion_check(self, obj):
         return Profile.objects.get(user=obj).conversion_check
+
     def _email(self, obj):
         return Profile.objects.get(user=obj).email
+
     def phone_number(self, obj):
         return Profile.objects.get(user=obj).phone_number
+
     def check_alert(self, obj):
         return Profile.objects.get(user=obj).check_alert
+
     def company_cnt(self, obj):
         return len(UserB.objects.filter(user_b=obj))
+
     def kakao_id(self, obj):
         return UserC.objects.get(user_c=obj).kakao_id
+
     def type(self, obj):
         return Profile.objects.get(user=obj).role_profile
 
@@ -94,17 +100,18 @@ class UserAdmin(BaseUserAdmin):
     def add_memo(self, request, queryset):  # 코드 리펙토링 할 것!
         count = 0
 
-        def dormant_Alert():
+        def _dormant_alert():
             user_list = User.objects.values()
 
             for users in user_list:
                 last_login = users['last_login']
                 if last_login is None:
                     last_login = users['date_joined']
-                return (datetime.timedelta(days=275) + last_login ) # 계정 전환 남은기간 계산
+                return datetime.timedelta(days=275) + last_login  # 계정 전환 남은기간 계산
         for z in queryset:
             x = User.objects.get(username=z).id
-            Profile.objects.filter(user_id=x).update(memo=Profile.objects.get(user_id=x).memo+'\n 사전알림 날짜 : ' + str(dormant_Alert()))
+            Profile.objects.filter(user_id=x).update(
+                memo=Profile.objects.get(user_id=x).memo+'\n 사전알림 날짜 : ' + str(_dormant_alert()))
             count += 1
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
 
@@ -132,7 +139,7 @@ class UserBAdmin(admin.ModelAdmin):
 
 
 class DormantUserInfoAdmin(admin.ModelAdmin):
-    list_display = ['username','last_login','dormant_date','delete_date']
+    list_display = ['username', 'last_login', 'dormant_date', 'delete_date']
 
 
 admin.site.unregister(User)

@@ -16,7 +16,7 @@ from .models import (
 )
 
 
-def dormant_alert(): # 휴면계정 알림
+def dormant_alert():  # 휴면계정 알림
     user_list = User.objects.values()
     for users in user_list:
         u = User.objects.get(id=users['id'])
@@ -29,8 +29,7 @@ def dormant_alert(): # 휴면계정 알림
         if dormant_time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림 if dormant_Time.days == 90:
             if Profile.objects.get(user=u).email:
                 if not Profile.objects.get(user=u).check_alert:
-                    email_message = EmailMessage('ZEROGO 휴면 전환 알림',
-                                         """
+                    email_message = EmailMessage('ZEROGO 휴면 전환 알림', """
     안녕하세요. 제로고입니다.
     
     회원님의 개인정보보호를 위해 1년 이상 사람인 서비스를 이용하지 않은 계정에 한해 정보통신망 이용 촉진 및 정보보호 등에 관한 법률에 따라 휴면 계정으로 전환될 예정입니다.
