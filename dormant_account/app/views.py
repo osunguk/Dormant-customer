@@ -42,8 +42,7 @@ def dormant_alert():  # 휴면계정 알림
                     email_message.send()
                     Profile.objects.filter(user=u).update(
                         check_alert=True,
-                        memo=Profile.objects.get(user=u).memo + '\n' + str(timezone.localtime()) + ' 시간부로 사전 알림 메세지 전송'
-                    )
+                        memo=Profile.objects.get(user=u).memo + '\n' + str(timezone.localtime()) + ' 시간부로 사전 알림 메세지 전송')
                 else:
                     pass
         if dormant_time.days <= 60:  # 계정 전환 60일 전 필터 값 update
@@ -53,16 +52,13 @@ def dormant_alert():  # 휴면계정 알림
 def change_account_group():  # 휴면계정 전환
     _user_list = User.objects.values()
     for users in _user_list:
-        _user = User.objects.get(id=users['id'])  # 유저리스트에서 username 가져옴
+        U = User.objects.get(id=users['id'])  # 유저리스트에서 username 가져옴
         last_login = users['last_login']
-
-        now = timezone.localtime()
         if last_login is None:
             last_login = users['date_joined']
 
         # 365일 이상 접속 X ==> 일반그룹 -> 휴면그룹으로 이동
-        if (now - last_login).days >= 365:
-            U = User.objects.get(username=_user)  # 일반계정의 데이터를 휴면계정으로 옮김
+        if (timezone.localtime() - last_login).days >= 365:
             dormant = DormantUserInfo(  # 생성할 휴면계정
                 id=U.id,
                 last_login=last_login,
@@ -211,20 +207,14 @@ def board(request):
 
 
 def user(request):
-    _user = request.user
-    last_login = request.user.last_login
-    joined_data = request.user.date_joined
-    now = timezone.localtime()
-    day = (now - last_login).days
-    result = (now - last_login)
-    return render(request, 'app/user.html', {'name': _user, 'last_login': last_login,
-                                             'joined_data': joined_data, 'now': now,
-                                             'result': result, 'day': day})
+    return render(request, 'app/user.html', {'name': request.user, 'last_login': request.user.last_login,
+                                             'joined_data': request.user.date_joined, 'now': timezone.localtime(),
+                                             'result': timezone.localtime()-request.user.last_login,
+                                             'day': (timezone.localtime()-request.user.last_login).days})
 
 
 def detail(request, number):  # 해당 number의 게시물을 불러와 html로 전송
-    content = get_object_or_404(Content, number=number)
-    return render(request, 'app/detail.html', {'content': content})
+    return render(request, 'app/detail.html', {'content': get_object_or_404(Content, number=number)})
 
 
 def delete(request, number):
@@ -254,9 +244,8 @@ def edit(request, number):
 
 
 def user_list(request):
-    pList = Profile.objects.values()
     result = []
-    for x in list(pList):
+    for x in list(Profile.objects.values()):
         u = User.objects.get(id=x['user_id'])
         sentence = u.username + '의 휴면계정 전환까지 남은 기간 : ' + str(x['dormant_cnt']) + '일'
         if x['dormant_cnt'] < 0:
