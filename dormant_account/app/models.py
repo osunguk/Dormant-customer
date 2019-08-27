@@ -33,7 +33,7 @@ class Profile(models.Model):
     CUSTOMER = 2
     ROLE_CHOICES = (
         (BUSINESS, 'Business'),
-        (CUSTOMER, 'Customer')
+        (CUSTOMER, 'Customer'),
     )
     # 기본 정보
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # 기존 User 모델에 1:1 대응을 생성

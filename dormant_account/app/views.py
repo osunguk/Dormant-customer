@@ -16,6 +16,26 @@ from .models import (
 )
 
 
+def init_last_login(queryset):  # 마지막 로그인 없을 시 초기화
+    for users in queryset:
+        if last_login is None:
+            last_login = users['date_joined']
+
+
+def cal_account_conversion():   # 계정 전환 남은기간 계산
+    init_last_login(User.objects.values())
+    for users in User.objects.values():
+        last_login = users['last_login']
+        return datetime.timedelta(days=365) + last_login - timezone.localtime()
+
+
+def update_60days_ago():    #계정 전환 60일 전 필터 값 update !!수정필요!!
+    init_last_login(User.objects.values())
+
+    for users in User.objects.values():
+        if cal_account_conversion().days <= 60:  # 계정 전환 60일 전 필터 값 update
+            Profile.objects.filter(user_id=users['id']).update(conversion_check=True)
+
 def dormant_alert():  # 휴면계정 알림
     _user_list = User.objects.values()
     mail_message_file = open('app/mail_message', 'rt', encoding='UTF-8')
@@ -24,6 +44,9 @@ def dormant_alert():  # 휴면계정 알림
         u = User.objects.get(id=users['id'])
         last_login = users['last_login']
         _dormant_time = last_login + datetime.timedelta(days=365)
+        print(datetime.timedelta(days=365))
+        print(last_login)
+        print(timezone.localtime())
         if last_login is None:
             last_login = users['date_joined']
         dormant_time = datetime.timedelta(days=365) + last_login - timezone.localtime()  # 계정 전환 남은기간 계산
