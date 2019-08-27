@@ -256,22 +256,19 @@ def user_list(request):
 
 def customer(request):
     if request.method == 'POST':
-        kakao_id = request.POST['kakao_id']
-        username = request.POST.get('username')
-        _user = User.objects.get(username=username)
-        u = UserC(kakao_id=kakao_id, mining_point=0, user_c=_user)
-        u.save()
-        return render(request, 'app/home.html', {'kakao_id': kakao_id})
+        UserC(kakao_id=request.POST['kakao_id'],
+              mining_point=0,
+              user_c=User.objects.get(username=request.POST.get('username')))
+        return render(request, 'app/home.html')
     return render(request, 'app/customer.html')
 
 
 def business(request):
     if request.method == 'POST':
-        business_num = request.POST['business_num']
-        company_name = request.POST['company_name']
         username = request.POST.get('username')
-        _user = User.objects.get(username=username)
-        u = UserB(business_number=business_num, company_name=company_name, star_point=0, user_b=_user)
-        u.save()
-        return render(request, 'app/home.html', {'business_num': business_num})
+        UserB(business_number=request.POST['business_num'],
+              company_name=request.POST['company_name'],
+              star_point=0,
+              user_b=User.objects.get(username=username))
+        return render(request, 'app/home.html')
     return render(request, 'app/business.html')
