@@ -32,7 +32,7 @@ def dormant_alert():  # 휴면계정 알림
             if Profile.objects.get(user=u).email:
                 if not Profile.objects.get(user=u).check_alert:
                     email_message = EmailMessage('ZEROGO 휴면 전환 알림',
-                                                 mail_message_file.read().format(_dormant_time.strftime('%Y-%m-%d')),
+                                                 mail_message_file.read().format(_dormant_time.strftime('%Y-%m-%d %H:%M')),
                                                  to=[Profile.objects.get(user=u).email])
                     email_message.send()
                     Profile.objects.filter(user=u).update(

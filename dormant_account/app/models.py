@@ -2,23 +2,31 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-#from django.utils import timezone
 from pytz import timezone
 from django.conf import settings
 
 
-
 class Content(models.Model):
+
+    def date_joined_korean_time(self):
+        korean_timezone = timezone(settings.TIME_ZONE)
+        return self.date_joined.astimezone(korean_timezone)
+
+    def last_edit_korean_time(self):
+        korean_timezone = timezone(settings.TIME_ZONE)
+        return self.last_edit.astimezone(korean_timezone)
+
     number = models.IntegerField('number', primary_key=True)
     title = models.CharField('title', max_length=100)
     contents = models.CharField(max_length=300)
     writer = models.CharField('writer', max_length=100)
 
-    date_joined = models.DateTimeField(auto_now_add=True)
-    last_edit = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateTimeField(default=date_joined_korean_time)
+    last_edit = models.DateTimeField(default=last_edit_korean_time)
 
     def __str__(self):
         return self.title
+
 
 class Profile(models.Model):
     BUSINESS = 1
@@ -68,6 +76,18 @@ class UserB(models.Model):
 
 
 class DormantUserInfo(models.Model):  # 휴면계정 모델
+    def last_login_korean_time(self):
+        korean_timezone = timezone(settings.TIME_ZONE)
+        return self.last_login.astimezone(korean_timezone)
+
+    def dormant_date_korean_time(self):
+        korean_timezone = timezone(settings.TIME_ZONE)
+        return self.dormant_date.astimezone(korean_timezone)
+
+    def delete_date_korean_time(self):
+        korean_timezone = timezone(settings.TIME_ZONE)
+        return self.delete_date.astimezone(korean_timezone)
+
     class Meta:
         verbose_name_plural = "휴면 계정"
     BUSINESS = 1
@@ -79,14 +99,14 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     # 공통 속성
     username = models.CharField('username', max_length=100, blank=True)
     role_dormant = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    last_login = models.DateTimeField(blank=True, auto_now_add=True)
+    last_login = models.DateTimeField(blank=True, default=last_login_korean_time)
     email = models.EmailField('이메일', max_length=100, blank=True)
     phone_number = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     memo = models.TextField('memo', max_length=1000, blank=True)
     
     # 휴면계정 속성
     dormant_date = models.DateTimeField(auto_now_add=True)
-    delete_date = models.DateTimeField(blank=True, auto_now_add=True)
+    delete_date = models.DateTimeField(blank=True, default=delete_date_korean_time)
     check_notice = models.BooleanField(default=False)
     
     # B 속성
@@ -98,8 +118,7 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     kakao_id = models.CharField('카카오톡 아이디', max_length=100, blank=True, null=True)
     mining_point = models.IntegerField('보유 포인트', default=0)
 
-# @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
-# @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))
+
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
