@@ -93,7 +93,7 @@ def change_account_group():  # 휴면계정 전환
                 dormant.company_name = ub.company_name
                 dormant.business_number = ub.business_number
                 dormant.star_point = ub.star_point
-            elif dormant.role_dormant == 2:  # 커스텀
+            elif Profile.objects.get(user=U).role_profile == 2:  # 커스텀
                 dormant.delete_date = dormant.dormant_date + datetime.timedelta(days=365)
                 uc = UserC.objects.get(user_c=U)
                 dormant.kakao_id = uc.kakao_id
