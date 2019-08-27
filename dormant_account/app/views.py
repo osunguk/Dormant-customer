@@ -22,14 +22,14 @@ def init_last_login(queryset):  # 마지막 로그인 없을 시 초기화
             last_login = users['date_joined']
 
 
-def cal_account_conversion():   # 계정 전환 남은기간 계산
+def cal_account_conversion():  # 계정 전환 남은기간 계산
     init_last_login(User.objects.values())
     for users_values in User.objects.values():
         last_login = users_values['last_login']
         return datetime.timedelta(days=365) + last_login - timezone.localtime()
 
 
-def update_60days_ago():    # 계정 전환 60일 전 필터 값 update !!수정필요!!
+def update_60days_ago():  # 계정 전환 60일 전 필터 값 update !!수정필요!!
     init_last_login(User.objects.values())
 
     for users_values in User.objects.values():
@@ -51,7 +51,8 @@ def dormant_alert():  # 휴면계정 알림
             if Profile.objects.get(user=user_id).email:
                 if not Profile.objects.get(user=user_id).check_alert:
                     email_message = EmailMessage('ZEROGO 휴면 전환 알림',
-                                                 mail_message_file.read().format(_dormant_time.strftime('%Y-%m-%d %H:%M')),
+                                                 mail_message_file.read().format(
+                                                     _dormant_time.strftime('%Y-%m-%d %H:%M')),
                                                  to=[Profile.objects.get(user=user_id).email])
                     email_message.send()
                     Profile.objects.filter(user=user_id).update(
@@ -134,7 +135,8 @@ def login(request):
                 email=dormant_username.email,
                 phone_number=dormant_username.phone_number,
                 role_profile=dormant_username.role_dormant,
-                memo=dormant_username.memo + '\n' + str(timezone.localtime()) + ' 시간부로 일반계정으로 전환'
+                memo=dormant_username.memo + '\n'
+                     + str(timezone.localtime()) + ' 시간부로 일반계정으로 전환'
             )
             if dormant_username.role_dormant == 1:
                 UserB(
