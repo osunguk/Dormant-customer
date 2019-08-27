@@ -20,7 +20,6 @@ def dormant_alert():  # 휴면계정 알림
     _user_list = User.objects.values()
     for users in _user_list:
         u = User.objects.get(id=users['id'])
-
         last_login = users['last_login']
         if last_login is None:
             last_login = users['date_joined']
@@ -41,9 +40,10 @@ def dormant_alert():  # 휴면계정 알림
     - 메일 발송 중지
     """.format(last_login + datetime.timedelta(days=365)), to=[Profile.objects.get(user=u).email])
                     email_message.send()
-                    Profile.objects.filter(user=u).update(check_alert=True)
-                    memo = Profile.objects.get(user=u).memo + '\n' + str(timezone.localtime()) + ' 시간부로 사전 알림 메세지 전송'
-                    Profile.objects.filter(user=u).update(memo=memo)
+                    Profile.objects.filter(user=u).update(
+                        check_alert=True,
+                        memo=Profile.objects.get(user=u).memo + '\n' + str(timezone.localtime()) + ' 시간부로 사전 알림 메세지 전송'
+                    )
                 else:
                     pass
         if dormant_time.days <= 60:  # 계정 전환 60일 전 필터 값 update

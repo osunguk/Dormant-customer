@@ -32,7 +32,7 @@ class Profile(models.Model):
     email = models.EmailField('이메일', max_length=100, blank=True)
     phone_number = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     dormant_cnt = models.IntegerField('휴면전환 남은 일자', default=0)
-    memo = models.TextField('Memo', max_length=1000, blank=True)
+    memo = models.TextField('Memo', max_length=1000, blank=True, default='')
     check_alert = models.BooleanField('사전알림 여부', default=False, blank=True)
     conversion_check = models.BooleanField('휴면전환 60전', default=False, blank=True)
 
