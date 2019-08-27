@@ -18,9 +18,12 @@ from .models import (
 
 def dormant_alert():  # 휴면계정 알림
     _user_list = User.objects.values()
+    mail_message_file = open('app/mail_message', 'rt', encoding='UTF-8')
+
     for users in _user_list:
         u = User.objects.get(id=users['id'])
         last_login = users['last_login']
+        _dormant_time = last_login + datetime.timedelta(days=365)
         if last_login is None:
             last_login = users['date_joined']
         dormant_time = datetime.timedelta(days=365) + last_login - timezone.localtime()  # 계정 전환 남은기간 계산
@@ -28,17 +31,9 @@ def dormant_alert():  # 휴면계정 알림
         if dormant_time.days <= 90:  # 휴면계정 변환 90일 전에만 하루알림 if dormant_Time.days == 90:
             if Profile.objects.get(user=u).email:
                 if not Profile.objects.get(user=u).check_alert:
-                    email_message = EmailMessage('ZEROGO 휴면 전환 알림', """
-    안녕하세요. 제로고입니다. 
-    
-    회원님의 개인정보보호를 위해 1년 이상 사람인 서비스를 이용하지 않은 계정에 한해 정보통신망 이용 촉진 및 정보보호 등에 관한 법률에 따라 휴면 계정으로 전환될 예정입니다.
-    회원님은 {} 까지 제로고 서비스 이용이 없을 경우 휴면 계정으로 전환될 예정이오니, 이를 원치 않으실 경우 로그인을 해주시기 바랍니다.
-    또한, 휴면계정으로 전환되어도 아이디/비밀번호로 로그인 하면 해제할 수 있으나, 아래와 같은 서비스에 대한 변경사항이 있으니 참고 바랍니다.
-    
-    휴면 계정 전환 시 변경 사항
-    - 회원의 개인정보는 별도 분리하여 보관
-    - 메일 발송 중지
-    """.format(last_login + datetime.timedelta(days=365)), to=[Profile.objects.get(user=u).email])
+                    email_message = EmailMessage('ZEROGO 휴면 전환 알림',
+                                                 mail_message_file.read().format(_dormant_time.strftime('%Y-%m-%d')),
+                                                 to=[Profile.objects.get(user=u).email])
                     email_message.send()
                     Profile.objects.filter(user=u).update(
                         check_alert=True,
@@ -209,8 +204,8 @@ def board(request):
 def user(request):
     return render(request, 'app/user.html', {'name': request.user, 'last_login': request.user.last_login,
                                              'joined_data': request.user.date_joined, 'now': timezone.localtime(),
-                                             'result': timezone.localtime()-request.user.last_login,
-                                             'day': (timezone.localtime()-request.user.last_login).days})
+                                             'result': timezone.localtime() - request.user.last_login,
+                                             'day': (timezone.localtime() - request.user.last_login).days})
 
 
 def detail(request, number):  # 해당 number의 게시물을 불러와 html로 전송

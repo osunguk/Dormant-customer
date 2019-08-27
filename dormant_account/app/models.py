@@ -2,7 +2,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
+#from django.utils import timezone
+from pytz import timezone
+from django.conf import settings
+
 
 
 class Content(models.Model):
@@ -11,12 +14,11 @@ class Content(models.Model):
     contents = models.CharField(max_length=300)
     writer = models.CharField('writer', max_length=100)
 
-    date_joined = models.DateTimeField(default=timezone.localtime())
-    last_edit = models.DateTimeField(default=timezone.localtime())
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_edit = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
-
 
 class Profile(models.Model):
     BUSINESS = 1
@@ -77,14 +79,14 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     # 공통 속성
     username = models.CharField('username', max_length=100, blank=True)
     role_dormant = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    last_login = models.DateTimeField(blank=True, default=timezone.localtime())
+    last_login = models.DateTimeField(blank=True, auto_now_add=True)
     email = models.EmailField('이메일', max_length=100, blank=True)
     phone_number = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     memo = models.TextField('memo', max_length=1000, blank=True)
     
     # 휴면계정 속성
-    dormant_date = models.DateTimeField(default=timezone.localtime())
-    delete_date = models.DateTimeField(blank=True, default=timezone.localtime())
+    dormant_date = models.DateTimeField(auto_now_add=True)
+    delete_date = models.DateTimeField(blank=True, auto_now_add=True)
     check_notice = models.BooleanField(default=False)
     
     # B 속성
@@ -95,7 +97,6 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     # C 속성
     kakao_id = models.CharField('카카오톡 아이디', max_length=100, blank=True, null=True)
     mining_point = models.IntegerField('보유 포인트', default=0)
-
 
 # @receiver 는 말그대로 수신기로 신호(signal)가 전송되면 실행되는 코드
 # @receiver 의 파라미터는 (어떤 신호인지, 시그널을 보낸 곳이 어디인지(송신자가 누구인지))

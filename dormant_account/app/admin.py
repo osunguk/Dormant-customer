@@ -56,6 +56,9 @@ class UserAdmin(BaseUserAdmin):
         ('시간 정보', {'fields': ('last_login', 'date_joined', )}),
     )
 
+    list_per_page = 10
+
+
     def dormant_cnt(self, obj):
         return Profile.objects.get(user=obj).dormant_cnt
 
