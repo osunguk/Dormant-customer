@@ -20,6 +20,14 @@
     <div class="col-lg-10">
       <label for="name" class="col-lg-2 control-label">Username:</label>
       <input type="text" class="form-control" id="name" placeholder="Enter username" name="name" required autofocus>
+      <input type="button" id="button1" onclick="button1_click();" value="중복 체크" />
+
+         <script>
+            function button1_click() {
+                alert("이미 존재하는 ID 입니다.");
+            }
+         </script>
+
       <div class="valid-feedback">Valid.</div>
       <div class="invalid-feedback">필수항목 입니다.</div>
     </div>
@@ -46,9 +54,39 @@
     </div>
 
     <div align="center">
+        <script type="text/javascript">
+
+            function setDisplay(){  //클릭 이벤트
+               if($('input:radio[id=Customer]').is(':checked')){
+                    $('#kakao_id').show();
+                    $('#company_name').hide();
+                }else{
+                    $('#company_name').show();
+                    $('#kakao_id').hide();
+                }
+            }
+
+
+        </script>
+
         <h4>TYPE 선택 : </h4>
-        <input type="radio" name="type" value="Business" /> Business
-        <input type="radio" name="type" value="Customer" checked="checked" /> Customer <br><br>
+        <input type="radio" name="type" id = "Business" value="Business" onchange="setDisplay()" /> Business
+        <input type="radio" name="type" id = "Customer" value="Customer" onchange="setDisplay()" checked="checked" onclick="view()" /> Customer <br><br>
+
+        <div id = "kakao_id">
+            <H6>KaKao ID : </H6>
+            <input type="text" name="kakao_id" >
+        </div>
+        <div id= "company_name" style="display:none">
+            <H6>사업자 번호 : </H6>
+            <input type="text" name="company_name" >
+            <H6>사업장 이름 : </H6>
+            <input type="text" name="business_num" >
+        </div>
+
+
+
+
     </div>
 
     <div class="form-group form-check" align="center">

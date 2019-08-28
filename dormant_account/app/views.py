@@ -174,9 +174,10 @@ def logout(request):
     return redirect(to='home')
 
 
-def signup(request):
+def signup(request):    # 회원가입
     if request.method == 'POST':
-        if User.objects.filter(username=request.POST['name']).exists():  # id가 중복일때 signup 거부
+        if User.objects.filter(username=request.POST['name']).exists() \
+                and DormantUserInfo.objects.filter(username=request.POST['name']):  # id가 중복일때 signup 거부
             pass
         _user = User.objects.create_user(
             username=request.POST['name'],
@@ -187,13 +188,25 @@ def signup(request):
             email=request.POST['email'],
             phone_number=request.POST['phone_number'],
         )
+
         if request.POST.get('type') == 'Business':
-            Profile.objects.filter(user=_user).update(role_profile=1)
-            return render(request, 'app/business.html', {'username': _user.username})
+            Profile.objects.filter(user=_user).update(role_profile=1)   # 비지니스
+            UserB(business_number=request.POST['business_num'],
+                  company_name=request.POST['company_name'],
+                  star_point=0,
+                  #user_b=User.objects.get(username=request.POST.get('username')),
+                  )
+
         else:
-            Profile.objects.filter(user=_user).update(role_profile=2)
-            return render(request, 'app/customer.html', {'username': _user.username})
-    return render(request, 'app/signup.html')
+            Profile.objects.filter(user=_user).update(role_profile=2)   # 커스터멀
+            UserC(kakao_id=request.POST['kakao_id'],
+                  mining_point=0,
+                  #user_c=User.objects.get(username=request.POST.get('username')),
+                  )
+
+        return render(request, 'app/home.html')
+    else:
+        return render(request, 'app/signup.html')
 
 
 def write(request):
@@ -203,8 +216,8 @@ def write(request):
         content = request.POST.get('content')
         Content.user = request.user
         if number.get('number') is None:
-            Content(number=1, title=title,
-                    contents=content, writer=User.get_username(Content.user),
+            Content(number=1, title=title, contents=content,
+                    writer=User.get_username(Content.user),
                     ).save()
         else:
             Content(number=number.get('number') + 1, title=title, contents=content,

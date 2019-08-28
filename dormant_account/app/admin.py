@@ -56,7 +56,7 @@ class UserAdmin(BaseUserAdmin):
         ('시간 정보', {'fields': ('last_login', 'date_joined', )}),
     )
 
-    list_per_page = 10
+    list_per_page = 20
 
 
     def dormant_cnt(self, obj):
