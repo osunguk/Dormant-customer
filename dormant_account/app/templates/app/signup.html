@@ -14,60 +14,64 @@
 <div class="jumbotron text-center">
     <h1>회원가입</h1>
 </div>
-    <form method="post" action="{%url 'signup'  %}" class="was-validated">
-      {% csrf_token %}
+<form method="post" action="{%url 'signup'  %}" class="was-validated">
+    {% csrf_token %}
 
     <div class="col-lg-10">
-      <label for="name" class="col-lg-2 control-label">Username:</label>
-      <input type="text" class="form-control" id="name" placeholder="Enter username" name="name" required autofocus>
-      <div class="valid-feedback">Valid.</div>
-      <div class="invalid-feedback">필수항목 입니다.</div>
+        <label for="name" class="col-lg-2 control-label">Username:</label>
+        <input type="text" class="form-control" id="name" placeholder="Enter username" name="name" required autofocus>
+        <div class="valid-feedback">Valid.</div>
+        <div class="invalid-feedback">필수항목 입니다.</div>
     </div>
 
     <div class="col-lg-10">
-      <label for="pwd" class="col-lg-2 control-label">Password:</label>
-      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd" required>
-      <div class="valid-feedback">Valid.</div>
-      <div class="invalid-feedback">필수항목 입니다.</div><br>
+        <label for="pwd" class="col-lg-2 control-label">Password:</label>
+        <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd" required>
+        <div class="valid-feedback">Valid.</div>
+        <div class="invalid-feedback">필수항목 입니다.</div>
+        <br>
     </div>
 
     <div class="col-lg-10">
-      <label for="email" class="col-lg-2 control-label" >Email:</label>
-      <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
-        <div class="invalid-feedback">필수항목 입니다.</div><br>
+        <label for="email" class="col-lg-2 control-label">Email:</label>
+        <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
+        <div class="invalid-feedback">필수항목 입니다.</div>
+        <br>
     </div>
 
     <div class="form-group" id="divPhoneNumber">
         <label for="inputPhoneNumber" class="col-lg-2 control-label">휴대폰 번호</label>
         <div class="col-lg-10">
-            <input type="tel" class="form-control onlyNumber" id="phone_number" name ="phone_number" data-rule-required="true" placeholder="-를 제외하고 숫자만 입력하세요." maxlength="11" required>
-            <div class="invalid-feedback">필수항목 입니다.</div><br>
+            <input type="tel" class="form-control onlyNumber" id="phone_number" name="phone_number"
+                   data-rule-required="true" placeholder="-를 제외하고 숫자만 입력하세요." maxlength="11" required>
+            <div class="invalid-feedback">필수항목 입니다.</div>
+            <br>
         </div>
     </div>
 
     <div align="center">
         <h4>TYPE 선택 : </h4>
-        <input type="radio" name="type" value="Business" /> Business
-        <input type="radio" name="type" value="Customer" checked="checked" /> Customer <br><br>
+        <input type="radio" name="type" value="Business"/> Business
+        <input type="radio" name="type" value="Customer" checked="checked"/> Customer <br><br>
     </div>
 
     <div class="form-group form-check" align="center">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" name="remember" required> 회원가입에 동의합니다.
-        <div class="valid-feedback">Valid.</div>
-        <div class="invalid-feedback">Check this checkbox to continue.</div>
-      </label>
+        <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" name="remember" required> 회원가입에 동의합니다.
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Check this checkbox to continue.</div>
+        </label>
     </div>
 
     <div align="center">
-    <button type="submit"  class="btn btn-primary">Sign Up</button>
-    <a href="{% url 'home' %}" class="btn btn-info" role="button">Home</a>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <a href="{% url 'home' %}" class="btn btn-info" role="button">Home</a>
     </div>
-  </form>
+</form>
 
 
 </div>
-    <script>
+<script>
             $(".onlyNumber").keyup(function(event){
             if (!(event.keyCode >=37 && event.keyCode<=40)) {
                 var inputVal = $(this).val();
@@ -75,7 +79,8 @@
             }
         });
 
-    </script>
+
+</script>
 
 </body>
 </html>

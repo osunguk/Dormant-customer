@@ -53,6 +53,7 @@ class Profile(models.Model):
 class UserC(models.Model):
     class Meta:
         verbose_name_plural = "커스텀 사용자"
+
     user_c = models.ForeignKey(User, on_delete=models.CASCADE)
 
     kakao_id = models.CharField('카카오톡 아이디', max_length=100)
@@ -65,10 +66,11 @@ class UserC(models.Model):
 class UserB(models.Model):
     class Meta:
         verbose_name_plural = "비즈니스 사용자"
+
     user_b = models.ForeignKey(User, on_delete=models.CASCADE)
 
     company_name = models.CharField('사업장 이름', max_length=100)
-    business_number = models.IntegerField('사업자 번호',)
+    business_number = models.IntegerField('사업자 번호', )
     star_point = models.IntegerField('보유 별', default=0)
 
     def __str__(self):
@@ -90,6 +92,7 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
 
     class Meta:
         verbose_name_plural = "휴면 계정"
+
     BUSINESS = 1
     CUSTOMER = 2
     ROLE_CHOICES = (
@@ -103,17 +106,17 @@ class DormantUserInfo(models.Model):  # 휴면계정 모델
     email = models.EmailField('이메일', max_length=100, blank=True)
     phone_number = models.CharField('핸드폰 번호', max_length=11, blank=True, null=True)
     memo = models.TextField('memo', max_length=1000, blank=True)
-    
+
     # 휴면계정 속성
     dormant_date = models.DateTimeField(auto_now_add=True)
     delete_date = models.DateTimeField(blank=True, default=delete_date_korean_time)
     check_notice = models.BooleanField(default=False)
-    
+
     # B 속성
     company_name = models.CharField('사업장 이름', max_length=100, blank=True, null=True)
     business_number = models.IntegerField('사업자 번호', blank=True, null=True)
     star_point = models.IntegerField('보유 별', default=0)
-    
+
     # C 속성
     kakao_id = models.CharField('카카오톡 아이디', max_length=100, blank=True, null=True)
     mining_point = models.IntegerField('보유 포인트', default=0)

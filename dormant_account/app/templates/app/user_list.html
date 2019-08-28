@@ -5,11 +5,11 @@
     <title>user_list</title>
 </head>
 <body>
-    <h2>사용자 목록</h2>
-    {% for result in results %}
-        <p>{{result}}</p>
-    {% endfor %}
+<h2>사용자 목록</h2>
+{% for result in results %}
+<p>{{result}}</p>
+{% endfor %}
 
-    <p><a href="{% url 'home' %}">돌아가기</a></p>
+<p><a href="{% url 'home' %}">돌아가기</a></p>
 </body>
 </html>

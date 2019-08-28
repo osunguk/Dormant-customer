@@ -5,13 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-    <form method="post" action="{%url 'customer'  %}" >
-        {% csrf_token %}
-        <H4>KaKao ID : </H4>
-        <input type="text" name="kakao_id" >
-        <input type=hidden name="username" value="{{username}}">
-        <input type="submit" value="확인">
-    </form>
+<form method="post" action="{%url 'customer'  %}">
+    {% csrf_token %}
+    <H4>KaKao ID : </H4>
+    <input type="text" name="kakao_id">
+    <input type=hidden name="username" value="{{username}}">
+    <input type="submit" value="확인">
+</form>
 
 
 <p><a href="{% url 'signup' %}">이전으로</a></p>

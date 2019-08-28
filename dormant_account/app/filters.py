@@ -25,7 +25,7 @@ class TypeFilter(admin.SimpleListFilter):
     parameter_name = 'type_filter'
 
     def lookups(self, request, model_admin):
-        return(
+        return (
             (1, '1 : 비즈니스'),
             (2, '2 : 커스터멀'),
             (3, '3')

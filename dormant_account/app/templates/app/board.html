@@ -5,31 +5,33 @@
     <title>게시판</title>
 </head>
 <body>
-    {% if check_dormant_account %}
-        <script>
+{% if check_dormant_account %}
+<script>
             alert("휴면계정에서 일반계정으로 전환되었습니다.")
-        </script>
-    {% endif %}
-    <h2>공지사항</h2>
-    {% if dormant_account %}
-        <p>휴면 계정 입니다</p>
-    {% endif %}
 
-    <h2>게시판</h2>
-    <p>총 게시물 수 : {{total}}개</p>
-    {% for content in contents %}
-    ============================
-    <p><b>제목</b> : {{content.title}} <b>&nbsp&nbsp&nbsp&nbsp&nbsp작성자</b> : {{content.writer}}</p>
-    ----------------------------
-    <p><b>내용</b> : {{content.contents}} <a href="{% url 'detail' content.number %}">더보기</a></p>
-    {% endfor %}
-    ============================
-    <br><br>
-    <a href="{% url 'write' %}">글쓰기</a>
-    <br><br>
-    <a href="{% url 'logout' %}">로그아웃</a>
-    <br><br>
-    <p>사용자 : {{userdata}}</p>
-    <p><a href="{% url 'user' %}">더보기</a></p>
+
+</script>
+{% endif %}
+<h2>공지사항</h2>
+{% if dormant_account %}
+<p>휴면 계정 입니다</p>
+{% endif %}
+
+<h2>게시판</h2>
+<p>총 게시물 수 : {{total}}개</p>
+{% for content in contents %}
+============================
+<p><b>제목</b> : {{content.title}} <b>&nbsp&nbsp&nbsp&nbsp&nbsp작성자</b> : {{content.writer}}</p>
+----------------------------
+<p><b>내용</b> : {{content.contents}} <a href="{% url 'detail' content.number %}">더보기</a></p>
+{% endfor %}
+============================
+<br><br>
+<a href="{% url 'write' %}">글쓰기</a>
+<br><br>
+<a href="{% url 'logout' %}">로그아웃</a>
+<br><br>
+<p>사용자 : {{userdata}}</p>
+<p><a href="{% url 'user' %}">더보기</a></p>
 </body>
 </html>

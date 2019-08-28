@@ -11,7 +11,6 @@ from .filters import (
     TypeFilter, CheckAlert, AccountConversionAlertFilter
 )
 
-
 admin.site.site_header = 'ZEROWEB'
 admin.site.site_title = 'Welcome '
 admin.site.index_title = 'ZEROGO User'
@@ -53,11 +52,10 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ('dormant_cnt',)
     fieldsets = (
         (None, {'fields': ('username',)}),
-        ('시간 정보', {'fields': ('last_login', 'date_joined', )}),
+        ('시간 정보', {'fields': ('last_login', 'date_joined',)}),
     )
 
     list_per_page = 10
-
 
     def dormant_cnt(self, obj):
         return Profile.objects.get(user=obj).dormant_cnt
@@ -111,10 +109,11 @@ class UserAdmin(BaseUserAdmin):
                 if last_login is None:
                     last_login = users['date_joined']
                 return datetime.timedelta(days=275) + last_login  # 계정 전환 남은기간 계산
+
         for z in queryset:
             x = User.objects.get(username=z).id
             Profile.objects.filter(user_id=x).update(
-                memo=Profile.objects.get(user_id=x).memo+'\n 사전알림 날짜 : ' + str(_dormant_alert()))
+                memo=Profile.objects.get(user_id=x).memo + '\n 사전알림 날짜 : ' + str(_dormant_alert()))
             count += 1
         self.message_user(request, " {} 명의 사전알림 날짜를 추가하였습니다.".format(count))
 

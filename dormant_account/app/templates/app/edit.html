@@ -5,12 +5,12 @@
     <title>edit</title>
 </head>
 <body>
-    <h2>게시물 수정</h2>
+<h2>게시물 수정</h2>
 
-    <form method="POST" action="{% url 'edit' content.number %}">{% csrf_token %}
-        <input type="text" name="title" value={{content.title}}><br><br>
-        <input type="text" name="content" value={{content.contents}} width=100 height=100><br><br>
-        <input type="submit" value="저장하기">
-    </form>
+<form method="POST" action="{% url 'edit' content.number %}">{% csrf_token %}
+    <input type="text" name="title" value={{content.title}}><br><br>
+    <input type="text" name="content" value={{content.contents}} width=100 height=100><br><br>
+    <input type="submit" value="저장하기">
+</form>
 </body>
 </html>
